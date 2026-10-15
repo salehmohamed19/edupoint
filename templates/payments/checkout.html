@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-8 sm:p-10 rounded-3xl shadow-sm border border-slate-100 my-6 space-y-8">
+    <div class="text-center">
+        <h1 class="text-3xl font-black text-slate-900 mb-2">إتمام الدفع والاشتراك 💳</h1>
+        <p class="text-slate-500 text-sm">أنت على وشك الاشتراك في كورس: <span class="font-bold text-indigo-600">{{ course.title }}</span></p>
+    </div>
+
+    <!-- صندوق المبلغ المطلوب -->
+    <div class="bg-gradient-to-r from-indigo-50 to-violet-50 p-6 rounded-2xl border border-indigo-100 flex items-center justify-between">
+        <div>
+            <span class="text-xs text-slate-500 font-bold block mb-1">المبلغ المطلوب سداده:</span>
+            <span class="text-3xl font-black text-indigo-600">{{ payment.amount }} <span class="text-sm font-bold">جنيه</span></span>
+        </div>
+        <div class="text-3xl">💰</div>
+    </div>
+
+    <!-- تعليمات وأرقام التحويل -->
+    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100 space-y-4">
+        <h3 class="font-bold text-slate-800 text-base">تعليمات الدفع اليدوي:</h3>
+        <p class="text-slate-600 text-sm leading-relaxed">
+            يرجى تحويل المبلغ المطلوب بواحدة من الطرق التالية، ثم قم برفع صورة الإيصال أو سكرين شوت التحويل بالأسفل لتتم مراجعته وتفعيل اشتراكك فوراً:
+        </p>
+        <ul class="space-y-2 text-sm font-semibold text-slate-700">
+            <li class="bg-white p-3 rounded-xl border border-slate-200 flex justify-between items-center">
+                <span>📱 فودافون كاش:</span>
+                <span class="text-indigo-600 font-black" dir="ltr">01024519625</span>
+            </li>
+            <li class="bg-white p-3 rounded-xl border border-slate-200 flex justify-between items-center">
+                <span>⚡ إنستاباي (Instapay):</span>
+                <span class="text-indigo-600 font-black" dir="ltr">salehrabia87@instapay</span>
+            </li>
+            <li class="bg-white p-3 rounded-xl border border-slate-200 flex justify-between items-center">
+                <span>🏦 تحويل بنكي / حساب بنكي:</span>
+                <span class="text-indigo-600 font-black" dir="ltr">EG1234567890123456789</span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- نموذج رفع الإيصال واختيار الطريقة -->
+    <form method="POST" enctype="multipart/form-data" class="space-y-5">
+        {% csrf_token %}
+        <div>
+            <label class="block text-sm font-bold text-slate-700 mb-2">اختر طريقة الدفع التي استخدمتها</label>
+            <select name="payment_method" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 font-medium outline-none focus:ring-2 focus:ring-indigo-500">
+                <option value="vodafone_cash">فودافون كاش</option>
+                <option value="instapay">إنستاباي (Instapay)</option>
+                <option value="bank_transfer">تحويل بنكي</option>
+                <option value="fawry">خدمة فوري</option>
+            </select>
+        </div>
+
+        <div>
+            <label class="block text-sm font-bold text-slate-700 mb-2">ارفع إيصال أو صورة التحويل (صورة أو PDF)</label>
+            <input type="file" name="receipt" required class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2.5 text-slate-800 font-medium file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100 transition">
+        </div>
+
+        <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold py-4 rounded-2xl hover:opacity-95 transition shadow-lg shadow-indigo-200 text-center">
+            إرسال إيصال الدفع للمراجعة 🚀
+        </button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,238 @@
+{% extends 'base.html' %}
+{% block title %}{{ lesson.title }} - {{ course.title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- شريط التنقل العلوي للعودة للكورس -->
+    <div class="mb-6 flex items-center justify-between">
+        <a href="{% url 'course_detail' course.id %}" class="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-800 font-bold transition text-sm">
+            <span>← العودة لتفاصيل الكورس</span>
+        </a>
+        <span class="text-xs font-bold px-3 py-1.5 rounded-full bg-slate-100 text-slate-600">
+            الكورس: {{ course.title }}
+        </span>
+    </div>
+
+    <!-- الهيكل الرئيسي: مشغل الفيديو المحمي بشدة + القائمة الجانبية -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- القسم الرئيسي: الفيديو والوصف والمرفقات -->
+        <div class="lg:col-span-2 space-y-6">
+            
+            <!-- مشغل الفيديو مع تفعيل شريط التحكم المباشر -->
+            <div class="bg-black rounded-3xl overflow-hidden shadow-2xl aspect-video relative border border-slate-800 flex items-center justify-center select-none" oncontextmenu="return false;" ondragstart="return false;">
+                
+                {% if lesson.video_file %}
+                    <!-- مشغل محلي مستقر للتحكم الكامل مع تعطيل زر التحميل فقط -->
+                    <video id="my-local-video" controls controlsList="nodownload" preload="metadata" class="w-full h-full object-contain pointer-events-auto">
+                        <source src="{{ lesson.video_file.url }}" type="video/mp4">
+                        متصفحك لا يدعم تشغيل الفيديو.
+                    </video>
+                {% elif embed_url %}
+                    <!-- مشغل إطار آمن ومستقر لفيديوهات يوتيوب أو درايف الخارجية -->
+                    <div class="relative w-full h-full">
+                        <div class="absolute inset-0 z-10 bg-transparent pointer-events-none"></div>
+                        <iframe 
+                            class="w-full h-full" 
+                            src="{{ embed_url }}" 
+                            title="{{ lesson.title }}" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                {% else %}
+                    <div class="flex flex-col items-center justify-center h-full text-slate-400">
+                        <span class="text-4xl mb-2">📹</span>
+                        <p class="font-bold text-sm">لا توجد مادة فيديو متاحة لهذا الدرس حالياً.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- زر إتمام الدرس والانتقال للدرس التالي -->
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex items-center justify-between">
+                <div>
+                    <h4 class="font-bold text-slate-900 text-sm">حالة الدرس التعليمي:</h4>
+                    <p class="text-xs text-slate-500 mt-0.5">شاهد الفيديو حتى النهاية لفتح قفل الانتقال للدرس التالي بنجاح.</p>
+                </div>
+                <button id="complete-lesson-btn" class="bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold px-6 py-3 rounded-2xl text-sm shadow-md transition opacity-50 cursor-not-allowed" disabled>
+                    إتمام والذهاب للدرس التالي 🚀
+                </button>
+            </div>
+
+            <!-- معلومات الدرس والوصف والمرفقات -->
+            <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 space-y-6">
+                
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-5">
+                    <div>
+                        <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-lg">الدرس رقم {{ lesson.order }}</span>
+                        <h1 class="text-2xl font-black text-slate-900 mt-2">{{ lesson.title }}</h1>
+                    </div>
+                </div>
+
+                <!-- وصف الدرس -->
+                <div>
+                    <h3 class="text-base font-bold text-slate-800 mb-2 flex items-center gap-2">
+                        <span>📝</span> وصف وملاحظات الدرس:
+                    </h3>
+                    {% if lesson.description %}
+                        <p class="text-slate-600 leading-relaxed font-medium text-sm whitespace-pre-line bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                            {{ lesson.description }}
+                        </p>
+                    {% else %}
+                        <p class="text-slate-400 text-sm italic">لا يوجد وصف مخصص لهذا الدرس.</p>
+                    {% endif %}
+                </div>
+
+                <!-- المرفقات -->
+                <div class="pt-4 border-t border-slate-100">
+                    <h3 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
+                        <span>📎</span> ملحقات ومستندات الدرس:
+                    </h3>
+                    {% if lesson.attachment %}
+                        <a href="{{ lesson.attachment.url }}" download class="inline-flex items-center gap-3 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 px-5 py-3 rounded-2xl font-bold transition text-sm shadow-sm group">
+                            <span class="text-lg group-hover:scale-110 transition">📥</span>
+                            <span>تحميل ملف المرفقات ({{ lesson.attachment.name|cut:'lesson_attachments/' }})</span>
+                        </a>
+                    {% else %}
+                        <p class="text-slate-400 text-sm italic">لا توجد ملفات مرفقة مع هذا الدرس.</p>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+
+        <!-- القائمة الجانبية (مع تطبيق القفل على الدروس غير المتاحة) -->
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 sticky top-28">
+                <div class="flex items-center justify-between mb-5 border-b border-slate-100 pb-4">
+                    <h2 class="text-lg font-black text-slate-900">محتوى الكورس 📚</h2>
+                    <span class="text-xs font-bold text-slate-400">{{ lessons_data|length }} دروس</span>
+                </div>
+
+                <div class="space-y-3 max-h-[550px] overflow-y-auto pr-1">
+                    {% for data in lessons_data %}
+                        {% if data.is_unlocked %}
+                            <!-- درس متاح ومفتوح -->
+                            <a href="{% url 'lesson_detail' course.id data.lesson.id %}" 
+                               class="flex items-center justify-between p-4 rounded-2xl transition border text-sm font-bold {% if data.lesson.id == lesson.id %}bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-100{% else %}bg-slate-50 text-slate-700 border-slate-100 hover:bg-slate-100{% endif %}">
+                                
+                                <div class="flex items-center gap-3 truncate">
+                                    <span class="w-7 h-7 rounded-xl flex items-center justify-center text-xs font-bold {% if data.lesson.id == lesson.id %}bg-white/20 text-white{% else %}bg-slate-200 text-slate-600{% endif %}">
+                                        {{ data.lesson.order }}
+                                    </span>
+                                    <span class="truncate">{{ data.lesson.title }}</span>
+                                </div>
+
+                                {% if data.lesson.id == lesson.id %}
+                                    <span class="text-xs bg-white/20 px-2.5 py-1 rounded-lg whitespace-nowrap">يعرض الآن ▶</span>
+                                {% elif data.is_completed %}
+                                    <span class="text-xs text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg">✓ مكتمل</span>
+                                {% endif %}
+                            </a>
+                        {% else %}
+                            <!-- درس مقفل ولا يمكن النقر عليه -->
+                            <div class="flex items-center justify-between p-4 rounded-2xl border text-sm font-bold bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed opacity-75" onclick="alert('عذراً، هذا الدرس مقفل. يجب مشاهدة الدرس السابق حتى نهايته أولاً لفتح قفله 🔒');">
+                                <div class="flex items-center gap-3 truncate">
+                                    <span class="w-7 h-7 rounded-xl flex items-center justify-center text-xs font-bold bg-slate-200 text-slate-500">
+                                        {{ data.lesson.order }}
+                                    </span>
+                                    <span class="truncate">{{ data.lesson.title }}</span>
+                                </div>
+                                <span class="text-xs bg-slate-200 text-slate-500 px-2.5 py-1 rounded-lg whitespace-nowrap">🔒 مقفل</span>
+                            </div>
+                        {% endif %}
+                    {% empty %}
+                        <p class="text-slate-400 text-sm text-center py-6">لا توجد دروس أُضيفت بعد.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- نظام الحماية ومنطق تتبع الـ 20 ثانية الأخيرة لتحديث الحالة -->
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        // 1. منع النقر بزر الماوس الأيمن والاختصارات لحماية المحتوى
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('dragstart', e => e.preventDefault());
+
+        document.addEventListener('keydown', (e) => {
+            if (
+                e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && ['I', 'J', 'C', 'i', 'j', 'c'].includes(e.key)) || 
+                (e.ctrlKey && ['u', 's', 'U', 'S'].includes(e.key))
+            ) {
+                e.preventDefault();
+                alert('عذراً، هذه العملية غير مسموحة لحماية محتوى المنصة التعليمية 🔒');
+                return false;
+            }
+        });
+
+        // 2. مراقبة الـ 20 ثانية الأخيرة للفيديو
+        const videoElement = document.getElementById('my-local-video');
+        const completeBtn = document.getElementById('complete-lesson-btn');
+        let isCompletedSent = false;
+
+        if (videoElement && completeBtn) {
+            videoElement.addEventListener('timeupdate', function() {
+                if (!isNaN(videoElement.duration) && !isCompletedSent) {
+                    const timeLeft = videoElement.duration - videoElement.currentTime;
+                    // إذا بقي 20 ثانية أو انتهى الفيديو
+                    if (timeLeft <= 20 || videoElement.ended) {
+                        isCompletedSent = true;
+                        
+                        // إرسال طلب إتمام الدرس للخلفية تلقائياً لفتح القفل عن الدرس التالي
+                        fetch("{% url 'mark_lesson_complete' lesson.id %}", {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': '{{ csrf_token }}',
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if(data.status === 'success') {
+                                completeBtn.disabled = false;
+                                completeBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                                completeBtn.classList.add('hover:scale-105', 'shadow-lg');
+                                completeBtn.innerText = 'تم إتمام الدرس بنجاح! الانتقال للتالي 🚀';
+                            }
+                        });
+                    }
+                }
+            });
+        } else if (completeBtn) {
+            // للروابط الخارجية يتم فتح الزر تلقائياً
+            setTimeout(() => {
+                completeBtn.disabled = false;
+                completeBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }, 10000);
+        }
+
+        // 3. الضغط على زر الانتقال للدرس التالي
+        if (completeBtn) {
+            completeBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                fetch("{% url 'mark_lesson_complete' lesson.id %}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if(data.status === 'success') {
+                        window.location.href = data.next_url;
+                    } else {
+                        alert('يجب إتمام مشاهدة الدرس أولاً.');
+                    }
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}

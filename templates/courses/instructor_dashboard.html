@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% block title %}لوحة تحكم المدرس - EduPoint{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto space-y-8">
+    
+    <!-- الترويسة الرئيسية -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+        <div>
+            <h1 class="text-3xl font-black text-slate-900">مرحباً بك، {{ request.user.get_full_name|default:request.user.username }} 👋</h1>
+            <p class="text-slate-500 text-sm mt-1">إليك نظرة عامة على أداء كورساتك ومستحقاتك المالية في منصة EduPoint.</p>
+        </div>
+        <a href="{% url 'create_course' %}" class="bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold px-6 py-3.5 rounded-2xl shadow-lg shadow-indigo-100 hover:opacity-95 transition text-center text-sm">
+            + إنشاء كورس جديد 🚀
+        </a>
+    </div>
+
+    <!-- بطاقات الإحصائيات المالية والتعليمية -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+        
+        <!-- صافي الأرباح الإجمالية (80%) -->
+        <div class="bg-gradient-to-br from-emerald-500 to-teal-600 text-white p-6 rounded-3xl shadow-xl shadow-emerald-100 space-y-2">
+            <div class="flex justify-between items-center opacity-80">
+                <span class="text-xs font-bold uppercase tracking-wider">إجمالي الأرباح (80%)</span>
+                <span class="text-xl">💰</span>
+            </div>
+            <h3 class="text-2xl font-black">{{ instructor_net_earnings|floatformat:2 }} ج.م</h3>
+            <p class="text-xs text-emerald-100 font-medium">صافي حصتك من المبيعات</p>
+        </div>
+
+        <!-- الرصيد المتبقي للتحويل -->
+        <div class="bg-gradient-to-br from-indigo-600 to-violet-600 text-white p-6 rounded-3xl shadow-xl shadow-indigo-100 space-y-2">
+            <div class="flex justify-between items-center opacity-80">
+                <span class="text-xs font-bold uppercase tracking-wider">الرصيد المتبقي لك</span>
+                <span class="text-xl">⏳</span>
+            </div>
+            <h3 class="text-2xl font-black">{{ remaining_balance|floatformat:2 }} ج.م</h3>
+            <p class="text-xs text-indigo-100 font-medium">بانتظار التحويل أو التسوية</p>
+        </div>
+
+        <!-- إجمالي المبيعات -->
+        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-2">
+            <div class="flex justify-between items-center text-slate-400">
+                <span class="text-xs font-bold uppercase tracking-wider">إجمالي المبيعات</span>
+                <span class="text-xl">📊</span>
+            </div>
+            <h3 class="text-2xl font-black text-slate-900">{{ total_gross_sales|floatformat:2 }} ج.م</h3>
+            <p class="text-xs text-slate-400 font-medium">شاملة عمولة المنصة (20%)[cite: 7]</p>
+        </div>
+
+        <!-- إجمالي الطلاب -->
+        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-2">
+            <div class="flex justify-between items-center text-slate-400">
+                <span class="text-xs font-bold uppercase tracking-wider">إجمالي الطلاب</span>
+                <span class="text-xl">👨‍🎓</span>
+            </div>
+            <h3 class="text-2xl font-black text-slate-900">{{ total_students }}[cite: 7]</h3>
+            <p class="text-xs text-slate-400 font-medium">طالب مشترك في كورساتك[cite: 7]</p>
+        </div>
+
+        <!-- عدد الكورسات -->
+        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-2">
+            <div class="flex justify-between items-center text-slate-400">
+                <span class="text-xs font-bold uppercase tracking-wider">الكورسات المنشورة</span>
+                <span class="text-xl">📚</span>
+            </div>
+            <h3 class="text-2xl font-black text-slate-900">{{ total_courses }}[cite: 7]</h3>
+            <p class="text-xs text-slate-400 font-medium">كورس نشط على المنصة[cite: 7]</p>
+        </div>
+
+    </div>
+
+    <!-- جدول تقرير الكورسات والأرباح التفصيلية -->
+    <div class="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm space-y-6">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-5">
+            <h2 class="text-xl font-black text-slate-900">تفاصيل أرباح الكورسات 📈</h2>
+            <span class="text-xs font-bold bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full">تحديث فوري</span>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-right text-sm">
+                <thead>
+                    <tr class="text-slate-400 border-b border-slate-100 font-bold">
+                        <th class="pb-4">اسم الكورس</th>
+                        <th class="pb-4">عدد الطلاب</th>
+                        <th class="pb-4">إجمالي المبيعات</th>
+                        <th class="pb-4">صافي أرباح المدرس (80%)</th>
+                        <th class="pb-4">الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50 font-bold text-slate-700">
+                    {% for item in course_financials %}
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="py-4 text-slate-900">{{ item.course.title }}</td>
+                        <td class="py-4">{{ item.students_count }} طالب</td>
+                        <td class="py-4 text-slate-900">{{ item.total_sales|floatformat:2 }} ج.م</td>
+                        <td class="py-4 text-emerald-600">{{ item.net_earnings|floatformat:2 }} ج.م</td>
+                        <td class="py-4">
+                            <a href="{% url 'add_lesson' item.course.id %}" class="text-xs bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-xl hover:bg-indigo-100 transition">
+                                + إضافة درس
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="py-8 text-center text-slate-400 font-medium">
+                            لا توجد كورسات مضافة بعد.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- سجل التحويلات المالية السابقة التي استلمها المدرس -->
+    <div class="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm space-y-6">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-5">
+            <h2 class="text-xl font-black text-slate-900">سجل التحويلات المالية المستلمة 💸</h2>
+            <span class="text-xs font-bold bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full">إجمالي المستلم: {{ total_payouts_received|floatformat:2 }} ج.م</span>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-right text-sm">
+                <thead>
+                    <tr class="text-slate-400 border-b border-slate-100 font-bold">
+                        <th class="pb-4">المبلغ المحول</th>
+                        <th class="pb-4">ملاحظات التحويل</th>
+                        <th class="pb-4">تاريخ العملية</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50 font-bold text-slate-700">
+                    {% for payout in payout_history %}
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="py-4 text-emerald-600 font-black">+ {{ payout.amount|floatformat:2 }} ج.م</td>
+                        <td class="py-4 text-slate-600">{{ payout.notes|default:"لا توجد ملاحظات" }}</td>
+                        <td class="py-4 text-slate-400 text-xs">{{ payout.created_at|date:"Y-m-d | h:i A" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="py-8 text-center text-slate-400 font-medium">
+                            لم يتم تسجيل أي عمليات تحويل مالية حتى الآن.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- تنبيه إرشادي -->
+    <div class="bg-indigo-50 border border-indigo-100 rounded-3xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-indigo-900">
+        <div class="flex items-center gap-3">
+            <span class="text-2xl">ℹ️</span>
+            <p class="text-sm font-bold">
+                يتم تسوية وتصفية الأرباح والمستحقات المالية وتحويلها لك شهرياً أو عند الطلب عبر الوسيلة المعتمدة (فودافون كاش / حساب بنكي).
+            </p>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
