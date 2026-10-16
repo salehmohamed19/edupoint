@@ -11,10 +11,14 @@ urlpatterns = [
     path('course/<int:course_pk>/add-review/', views.add_review, name='add_review'),
     path('instructor/dashboard/', views.instructor_dashboard, name='instructor_dashboard'),
     path('course/<int:course_pk>/lesson/<int:lesson_pk>/', views.lesson_detail, name='lesson_detail'),
-    path('course/<int:course_pk>/certificate/', views.view_certificate, name='view_certificate'), # مسار الشهادة
+    path('course/<int:course_pk>/certificate/', views.view_certificate, name='view_certificate'),
     path('lesson/<int:lesson_pk>/complete/', views.mark_lesson_complete, name='mark_lesson_complete'),
+    
+    # --- أضف هذا السطر هنا لتختفي المشكلة فوراً ---
+    path('lesson/<int:lesson_pk>/save-progress/', views.save_video_progress, name='save_video_progress'),
+    
     path('course/<int:course_pk>/edit/', views.edit_course, name='edit_course'),
     path('course/<int:course_pk>/delete/', views.delete_course, name='delete_course'),
-    path('lesson/<int:lesson_pk>/edit/', views.edit_lesson, name='edit_lesson'), # <-- مسار تعديل الدرس الجديد
+    path('lesson/<int:lesson_pk>/edit/', views.edit_lesson, name='edit_lesson'),
     path('lesson/<int:lesson_pk>/delete/', views.delete_lesson, name='delete_lesson'),
 ]
