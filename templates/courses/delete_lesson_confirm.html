@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}تأكيد حذف الدرس - EduPoint{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white p-8 rounded-3xl shadow-xl border border-slate-100 text-center space-y-6 my-10">
+    <div class="w-20 h-20 bg-rose-50 text-rose-600 rounded-3xl flex items-center justify-center mx-auto text-4xl shadow-inner">
+        ⚠️
+    </div>
+    <div class="space-y-2">
+        <h1 class="text-2xl font-black text-slate-900">هل أنت متأكد من حذف الدرس؟</h1>
+        <p class="text-slate-500 text-sm font-semibold">
+            أنت على وشك حذف الدرس: <span class="font-bold text-rose-600">{{ lesson.title }}</span> من كورس "{{ course.title }}". لن يمكنك استرجاعه لاحقاً!
+        </p>
+    </div>
+    <form method="POST" class="flex gap-3 pt-4">
+        {% csrf_token %}
+        <button type="submit" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-bold py-3.5 rounded-2xl shadow-lg shadow-rose-100 transition text-sm">
+            نعم، احذف الدرس 🗑️
+        </button>
+        <a href="{% url 'course_detail' course.id %}" class="px-6 py-3.5 rounded-2xl border border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 transition flex items-center justify-center">
+            تراجع
+        </a>
+    </form>
+</div>
+{% endblock %}

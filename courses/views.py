@@ -130,6 +130,62 @@ def create_course(request):
 
   return render(request, 'courses/create_course.html')
 
+@login_required
+def edit_course(request, course_pk):
+  course = get_object_or_404(Course, pk=course_pk)
+  
+  # التأكد أن المدرس هو مالك الكورس
+  if course.instructor != request.user:
+    messages.error(request, 'غير مسموح لك بتعديل هذا الكورس.')
+    return redirect('instructor_dashboard')
+
+  if request.method == 'POST':
+    course.title = request.POST.get('title')
+    course.description = request.POST.get('description')
+    price = request.POST.get('price', 0)
+    course.is_free = True if request.POST.get('is_free') == 'on' else False
+    course.price = price if not course.is_free else 0
+    course.save()
+
+    messages.success(request, f'تم تحديث بيانات الكورس "{course.title}" بنجاح! ✏️')
+    return redirect('instructor_dashboard')
+
+  return render(request, 'courses/edit_course.html', {'course': course})
+
+
+@login_required
+def delete_course(request, course_pk):
+  course = get_object_or_404(Course, pk=course_pk)
+  
+  if course.instructor != request.user:
+    messages.error(request, 'غير مسموح لك بحذف هذا الكورس.')
+    return redirect('instructor_dashboard')
+
+  if request.method == 'POST':
+    course_title = course.title
+    course.delete()
+    messages.success(request, f'تم حذف الكورس "{course_title}" بنجاح 🗑️')
+    return redirect('instructor_dashboard')
+
+  return render(request, 'courses/delete_course_confirm.html', {'course': course})
+
+
+@login_required
+def delete_lesson(request, lesson_pk):
+  lesson = get_object_or_404(Lesson, pk=lesson_pk)
+  course = lesson.course
+
+  if course.instructor != request.user:
+    messages.error(request, 'غير مسموح لك بحذف هذا الدرس.')
+    return redirect('course_detail', pk=course.pk)
+
+  if request.method == 'POST':
+    lesson_title = lesson.title
+    lesson.delete()
+    messages.success(request, f'تم حذف الدرس "{lesson_title}" بنجاح 🗑️')
+    return redirect('course_detail', pk=course.pk)
+
+  return render(request, 'courses/delete_lesson_confirm.html', {'lesson': lesson, 'course': course})
 
 @login_required
 def add_lesson(request, course_pk):

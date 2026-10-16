@@ -70,11 +70,11 @@
 
     </div>
 
-    <!-- جدول تقرير الكورسات والأرباح التفصيلية -->
+    <!-- جدول تقرير الكورسات والأرباح التفصيلية لكل كورس على حدة -->
     <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-xl shadow-slate-200/50 space-y-6">
         <div class="flex items-center justify-between border-b border-slate-100 pb-5">
-            <h2 class="text-lg sm:text-xl font-black text-slate-900">تفاصيل أرباح الكورسات 📈</h2>
-            <span class="text-xs font-extrabold bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full">تحديث فوري</span>
+            <h2 class="text-lg sm:text-xl font-black text-slate-900">تفاصيل الكورسات وأرباحها المستقلة 📈</h2>
+            <span class="text-xs font-extrabold bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full">إدارة وتعديل مباشر</span>
         </div>
 
         <div class="overflow-x-auto">
@@ -82,29 +82,37 @@
                 <thead>
                     <tr class="text-slate-400 border-b border-slate-100 font-bold">
                         <th class="pb-4">اسم الكورس</th>
-                        <th class="pb-4">عدد الطلاب</th>
-                        <th class="pb-4">إجمالي المبيعات</th>
-                        <th class="pb-4">صافي أرباح المدرس (80%)</th>
-                        <th class="pb-4">الإجراءات</th>
+                        <th class="pb-4">عدد الطلاب المشتركين</th>
+                        <th class="pb-4">إجمالي مبيعات الكورس</th>
+                        <th class="pb-4">صافي أرباحك (80%)</th>
+                        <th class="pb-4">إجراءات التحكم (تعديل / حذف / دروس)</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-50 font-bold text-slate-700">
                     {% for item in course_financials %}
                     <tr class="hover:bg-slate-50/80 transition">
-                        <td class="py-4 text-slate-900 font-black">{{ item.course.title }}</td>
-                        <td class="py-4">{{ item.students_count }} طالب</td>
+                        <td class="py-4 text-slate-900 font-black">
+                            <a href="{% url 'course_detail' item.course.id %}" class="hover:text-indigo-600 transition">{{ item.course.title }}</a>
+                        </td>
+                        <td class="py-4 text-indigo-600 font-black">{{ item.students_count }} طالب</td>
                         <td class="py-4 text-slate-900">{{ item.total_sales|floatformat:2 }} ج.م</td>
                         <td class="py-4 text-emerald-600 font-black">{{ item.net_earnings|floatformat:2 }} ج.م</td>
-                        <td class="py-4">
+                        <td class="py-4 flex items-center gap-2">
                             <a href="{% url 'add_lesson' item.course.id %}" class="text-xs bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-xl hover:bg-indigo-100 transition font-extrabold">
-                                + إضافة درس
+                                + درس
+                            </a>
+                            <a href="{% url 'edit_course' item.course.id %}" class="text-xs bg-amber-50 text-amber-700 px-3 py-1.5 rounded-xl hover:bg-amber-100 transition font-extrabold">
+                                ✏️ تعديل
+                            </a>
+                            <a href="{% url 'delete_course' item.course.id %}" class="text-xs bg-rose-50 text-rose-600 px-3 py-1.5 rounded-xl hover:bg-rose-100 transition font-extrabold">
+                                🗑️ حذف
                             </a>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
                         <td colspan="5" class="py-8 text-center text-slate-400 font-semibold text-xs">
-                            لا توجد كورسات مضافة بعد.
+                            لا توجد كورسات مضافة بعد. ابدأ بإنشاء كورس جديد الآن!
                         </td>
                     </tr>
                     {% endfor %}
