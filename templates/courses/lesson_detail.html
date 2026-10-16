@@ -69,12 +69,16 @@
                         <h1 class="text-xl sm:text-2xl font-black text-slate-900 mt-2">{{ lesson.title }}</h1>
                     </div>
 
-                    <!-- زر حذف الدرس يظهر فقط للمدرس مالك الكورس -->
+                    <!-- أزرار التعديل والحذف تظهر فقط للمدرس مالك الكورس -->
                     {% if user == course.instructor %}
-                    <div>
-                        <a href="{% url 'delete_lesson' lesson.id %}" class="inline-flex items-center gap-2 bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 px-4 py-2.5 rounded-2xl font-bold transition text-xs whitespace-nowrap shadow-sm">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <a href="{% url 'edit_lesson' lesson.id %}" class="inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 px-4 py-2.5 rounded-2xl font-bold transition text-xs whitespace-nowrap shadow-sm">
+                            <span>✏️</span>
+                            <span>تعديل الدرس</span>
+                        </a>
+                        <a href="{% url 'delete_lesson' lesson.id %}" class="inline-flex items-center gap-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 px-4 py-2.5 rounded-2xl font-bold transition text-xs whitespace-nowrap shadow-sm">
                             <span>🗑️</span>
-                            <span>حذف هذا الدرس</span>
+                            <span>حذف الدرس</span>
                         </a>
                     </div>
                     {% endif %}

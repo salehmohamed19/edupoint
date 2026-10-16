@@ -217,6 +217,38 @@ def add_lesson(request, course_pk):
 
   return render(request, 'courses/add_lesson.html', {'course': course})
 
+@login_required
+def edit_lesson(request, lesson_pk):
+  lesson = get_object_or_404(Lesson, pk=lesson_pk)
+  course = lesson.course
+
+  # التأكد أن المستخدم هو مدرس الكورس مالك الدرس
+  if course.instructor != request.user:
+    messages.error(request, 'غير مسموح لك بتعديل هذا الدرس.')
+    return redirect('course_detail', pk=course.pk)
+
+  if request.method == 'POST':
+    lesson.title = request.POST.get('title')
+    lesson.video_url = request.POST.get('video_url')
+    
+    # تحديث ملف الفيديو إن وجد ملف جديد مرفوع
+    if request.FILES.get('video_file'):
+      lesson.video_file = request.FILES.get('video_file')
+      
+    lesson.description = request.POST.get('description')
+    
+    # تحديث الملف المرفق إن وجد ملف جديد
+    if request.FILES.get('attachment'):
+      lesson.attachment = request.FILES.get('attachment')
+      
+    lesson.order = request.POST.get('order', 1)
+    lesson.save()
+
+    messages.success(request, f'تم تحديث الدرس "{lesson.title}" بنجاح! ✏️')
+    return redirect('lesson_detail', course.pk, lesson.pk)
+
+  return render(request, 'courses/edit_lesson.html', {'lesson': lesson, 'course': course})
+
 
 @login_required
 def student_dashboard(request):

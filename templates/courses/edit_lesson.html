@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}تعديل الدرس - {{ lesson.title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto bg-white p-6 sm:p-10 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 my-4 sm:my-8 transition-all">
+    <div class="text-center mb-8">
+        <div class="w-16 h-16 rounded-3xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto text-3xl mb-4 shadow-inner">
+            ✏️
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-black text-slate-900 mb-2">تعديل بيانات الدرس</h1>
+        <p class="text-slate-500 text-xs sm:text-sm font-semibold">للكورس: <span class="font-bold text-indigo-600">{{ course.title }}</span></p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" class="space-y-5">
+        {% csrf_token %}
+        <div>
+            <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-2">عنوان الدرس</label>
+            <input type="text" name="title" value="{{ lesson.title }}" required class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3 text-slate-800 text-sm font-semibold focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 focus:bg-white outline-none transition duration-200">
+        </div>
+        
+        <!-- حقل رفع ملف الفيديو -->
+        <div>
+            <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-2">تغيير ملف الفيديو (اختياري)</label>
+            {% if lesson.video_file %}
+                <p class="text-xs text-emerald-600 font-bold mb-1.5">✓ يوجد فيديو مرفوع حالياً</p>
+            {% endif %}
+            <input type="file" name="video_file" accept="video/*" class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-2.5 text-slate-800 text-xs sm:text-sm font-semibold file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-black file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100 transition">
+        </div>
+
+        <div>
+            <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-2">أو رابط فيديو خارجي (YouTube)</label>
+            <input type="url" name="video_url" value="{{ lesson.video_url|default:'' }}" class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3 text-slate-800 text-sm font-semibold focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 focus:bg-white outline-none transition duration-200">
+        </div>
+
+        <div>
+            <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-2">وصف الدرس أو ملاحظات</label>
+            <textarea name="description" rows="3" class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3 text-slate-800 text-sm font-semibold focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 focus:bg-white outline-none transition duration-200 resize-none">{{ lesson.description|default:'' }}</textarea>
+        </div>
+        
+        <div>
+            <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-2">تغيير الملف المرفق (PDF, ZIP...)</label>
+            {% if lesson.attachment %}
+                <p class="text-xs text-emerald-600 font-bold mb-1.5">✓ مرفق حالي: {{ lesson.attachment.name|cut:'lesson_attachments/' }}</p>
+            {% endif %}
+            <input type="file" name="attachment" class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-2.5 text-slate-800 text-xs sm:text-sm font-semibold file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-black file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100 transition">
+        </div>
+
+        <div>
+            <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-2">ترتيب الدرس (رقم)</label>
+            <input type="number" name="order" value="{{ lesson.order }}" class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3 text-slate-800 text-sm font-semibold focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 focus:bg-white outline-none transition duration-200">
+        </div>
+
+        <div class="flex gap-3 pt-2">
+            <button type="submit" class="flex-1 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold py-3.5 rounded-2xl transition duration-300 shadow-lg shadow-indigo-200 text-sm flex items-center justify-center gap-2">
+                <span>حفظ التعديلات</span>
+                <span>✨</span>
+            </button>
+            <a href="{% url 'lesson_detail' course.id lesson.id %}" class="px-6 py-3.5 rounded-2xl border border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 transition flex items-center justify-center">
+                إلغاء
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
