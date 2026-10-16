@@ -15,18 +15,14 @@ def initiate_payment(request, course_pk):
     messages.success(request, f'تم انضمامك بنجاح إلى كورس "{course.title}" 🚀')
     return redirect('course_detail', pk=course.pk)
 
-  # التحقق إذا كان لدى الطالب عملية دفع سابقة مكتملة أو قيد المراجعة لنفس الكورس
-  existing_payment = Payment.objects.filter(
-      student=request.user, course=course, status__in=['completed', 'pending_verification']
-  ).first()
+  # التحقق إذا كان لدى الطالب اشتراك مكتمل أو طلب قيد المراجعة حالياً
+  existing_completed = Payment.objects.filter(
+      student=request.user, course=course, status='completed'
+  ).exists()
   
-  if existing_payment:
-    if existing_payment.status == 'completed':
-      messages.info(request, 'أنت مشترك بالفعل في هذا الكورس.')
-      return redirect('course_detail', pk=course.pk)
-    else:
-      messages.info(request, 'لديك طلب دفع سابق قيد المراجعة من قِبل الإدارة.')
-      return redirect('course_detail', pk=course.pk)
+  if existing_completed:
+    messages.info(request, 'أنت مشترك بالفعل في هذا الكورس.')
+    return redirect('course_detail', pk=course.pk)
 
   # إذا أرسل المستخدم بيانات الدفع والإيصال عبر نموذج POST
   if request.method == 'POST':
@@ -37,32 +33,32 @@ def initiate_payment(request, course_pk):
       messages.error(request, 'يرجى إرفاق صورة أو ملف إيصال الدفع.')
       return redirect('initiate_payment', course_pk=course.pk)
 
-    # إنشاء سجل الدفع اليدوي
-    payment = Payment.objects.create(
+    # البحث عن أي طلب سابق معلق أو قيد المراجعة لنفس الطالب والكورس وتحديثه بدلاً من التكرار
+    payment, created = Payment.objects.update_or_create(
         student=request.user,
         course=course,
-        amount=course.price,
-        provider='ManualTransfer',
-        payment_method=payment_method,
-        receipt=receipt,
-        status='pending_verification',
+        status__in=['pending', 'pending_verification'],
+        defaults={
+            'amount': course.price,
+            'provider': 'ManualTransfer',
+            'payment_method': payment_method,
+            'receipt': receipt,
+            'status': 'pending_verification',
+        }
     )
     
     messages.success(request, 'تم إرسال إيصال الدفع بنجاح! سيتم مراجعته وتفعيل اشتراكك قريباً.')
     return redirect('payment_success', payment_id=payment.id)
 
-  # إنشاء سجل مبدئي عرضي لعرض المبلغ في صفحة التشيك آوت
-  payment, _ = Payment.objects.get_or_create(
-      student=request.user,
-      course=course,
-      status='pending',
-      defaults={'amount': course.price}
-  )
+  # في حالة عرض صفحة الـ checkout فقط (GET) - لا نقوم بإنشاء سجل فارغ في قاعدة البيانات
+  # بل نأخذ السجل القديم المعلق إن وجد لعرض بياناته أو نترك الكورس للعرض فقط
+  payment = Payment.objects.filter(
+      student=request.user, course=course, status__in=['pending', 'pending_verification']
+  ).first()
 
   return render(
       request, 'payments/checkout.html', {'course': course, 'payment': payment}
   )
-
 
 @login_required
 def payment_success(request, payment_id):
