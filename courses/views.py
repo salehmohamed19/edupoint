@@ -1,8 +1,11 @@
+import json
 from decimal import Decimal
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from payments.models import Payment
 from .models import (
     Certificate,
@@ -43,10 +46,9 @@ def course_detail(request, pk):
       Enrollment.objects.get_or_create(student=request.user, course=course)
       is_enrolled = True
 
-  # حساب حالة القفل والفتح للدروس لعرضها بدقة في صفحة تفاصيل الكورس
   all_lessons = list(course.lessons.all().order_by('order'))
   lessons_data = []
-  
+
   if request.user.is_authenticated:
     completed_lesson_ids = set(
         LessonProgress.objects.filter(
@@ -77,7 +79,7 @@ def course_detail(request, pk):
       request,
       'courses/course_detail.html',
       {
-          'course': course, 
+          'course': course,
           'is_enrolled': is_enrolled,
           'lessons_data': lessons_data,
       },
@@ -130,11 +132,11 @@ def create_course(request):
 
   return render(request, 'courses/create_course.html')
 
+
 @login_required
 def edit_course(request, course_pk):
   course = get_object_or_404(Course, pk=course_pk)
-  
-  # التأكد أن المدرس هو مالك الكورس
+
   if course.instructor != request.user:
     messages.error(request, 'غير مسموح لك بتعديل هذا الكورس.')
     return redirect('instructor_dashboard')
@@ -156,7 +158,7 @@ def edit_course(request, course_pk):
 @login_required
 def delete_course(request, course_pk):
   course = get_object_or_404(Course, pk=course_pk)
-  
+
   if course.instructor != request.user:
     messages.error(request, 'غير مسموح لك بحذف هذا الكورس.')
     return redirect('instructor_dashboard')
@@ -186,6 +188,7 @@ def delete_lesson(request, lesson_pk):
     return redirect('course_detail', pk=course.pk)
 
   return render(request, 'courses/delete_lesson_confirm.html', {'lesson': lesson, 'course': course})
+
 
 @login_required
 def add_lesson(request, course_pk):
@@ -217,12 +220,12 @@ def add_lesson(request, course_pk):
 
   return render(request, 'courses/add_lesson.html', {'course': course})
 
+
 @login_required
 def edit_lesson(request, lesson_pk):
   lesson = get_object_or_404(Lesson, pk=lesson_pk)
   course = lesson.course
 
-  # التأكد أن المستخدم هو مدرس الكورس مالك الدرس
   if course.instructor != request.user:
     messages.error(request, 'غير مسموح لك بتعديل هذا الدرس.')
     return redirect('course_detail', pk=course.pk)
@@ -230,17 +233,15 @@ def edit_lesson(request, lesson_pk):
   if request.method == 'POST':
     lesson.title = request.POST.get('title')
     lesson.video_url = request.POST.get('video_url')
-    
-    # تحديث ملف الفيديو إن وجد ملف جديد مرفوع
+
     if request.FILES.get('video_file'):
       lesson.video_file = request.FILES.get('video_file')
-      
+
     lesson.description = request.POST.get('description')
-    
-    # تحديث الملف المرفق إن وجد ملف جديد
+
     if request.FILES.get('attachment'):
       lesson.attachment = request.FILES.get('attachment')
-      
+
     lesson.order = request.POST.get('order', 1)
     lesson.save()
 
@@ -253,8 +254,19 @@ def edit_lesson(request, lesson_pk):
 @login_required
 def student_dashboard(request):
   enrollments = Enrollment.objects.filter(student=request.user)
+
+  # جلب أحدث درس تابع للطلاب قام بمشاهدة جزء منه ولم يكمله بعد
+  last_progress = LessonProgress.objects.filter(
+      student=request.user, is_completed=False, watched_seconds__gt=0
+  ).order_by('-completed_at').first()
+
   return render(
-      request, 'courses/student_dashboard.html', {'enrollments': enrollments}
+      request,
+      'courses/student_dashboard.html',
+      {
+          'enrollments': enrollments,
+          'last_progress': last_progress,
+      },
   )
 
 
@@ -371,7 +383,6 @@ def lesson_detail(request, course_pk, lesson_pk):
 
   all_lessons = list(course.lessons.all().order_by('order'))
 
-  # --- نظام القفل والتتابع الصارم ---
   if not is_instructor_owner:
     try:
       current_index = all_lessons.index(lesson)
@@ -392,7 +403,6 @@ def lesson_detail(request, course_pk, lesson_pk):
         )
         return redirect('lesson_detail', course.pk, previous_lesson.pk)
 
-  # بناء حالة القفل والفتح لكل درس بدقة تامة
   lessons_data = []
   completed_lesson_ids = set(
       LessonProgress.objects.filter(
@@ -403,7 +413,6 @@ def lesson_detail(request, course_pk, lesson_pk):
   for index, item in enumerate(all_lessons):
     is_completed = item.id in completed_lesson_ids
 
-    # الدرس الأول مفتوح دائماً، والباقي لا يفتح إلا بإتمام الدرس السابق فعلياً
     if is_instructor_owner or index == 0:
       is_unlocked = True
     else:
@@ -416,7 +425,6 @@ def lesson_detail(request, course_pk, lesson_pk):
         'is_unlocked': is_unlocked,
     })
 
-  # معالجة روابط الفيديو
   raw_url = lesson.video_url or ''
   embed_url = ''
   if 'youtube.com/watch?v=' in raw_url:
@@ -441,6 +449,12 @@ def lesson_detail(request, course_pk, lesson_pk):
   else:
     embed_url = raw_url
 
+  # جلب وقت التوقف المسبق للدرس
+  current_progress = LessonProgress.objects.filter(
+      student=request.user, lesson=lesson
+  ).first()
+  saved_seconds = current_progress.watched_seconds if current_progress else 0.0
+
   return render(
       request,
       'courses/lesson_detail.html',
@@ -450,6 +464,7 @@ def lesson_detail(request, course_pk, lesson_pk):
           'lessons_data': lessons_data,
           'embed_url': embed_url,
           'is_enrolled': is_enrolled,
+          'saved_seconds': saved_seconds,
       },
   )
 
@@ -465,7 +480,6 @@ def view_certificate(request, course_pk):
     messages.error(request, 'يجب أن تكون مشتركاً في الكورس لعرض الشهادة.')
     return redirect('course_detail', pk=course.pk)
 
-  # --- نظام قفل الشهادة حتى إتمام جميع دروس الكورس ---
   if course.instructor != request.user:
     total_lessons = course.lessons.count()
     completed_lessons = LessonProgress.objects.filter(
@@ -490,29 +504,24 @@ def view_certificate(request, course_pk):
       {'course': course, 'certificate': certificate},
   )
 
-from django.http import JsonResponse
-from django.urls import reverse
 
 @login_required
 def mark_lesson_complete(request, lesson_pk):
   lesson = get_object_or_404(Lesson, pk=lesson_pk)
   course = lesson.course
 
-  # التحقق من أن الطالب مشترك
   is_enrolled = Enrollment.objects.filter(
       student=request.user, course=course
   ).exists()
   if not is_enrolled and course.instructor != request.user:
     return JsonResponse({'status': 'error', 'message': 'غير مشترك'}, status=403)
 
-  # تسجيل إتمام الدرس
   progress, _ = LessonProgress.objects.get_or_create(
       student=request.user, lesson=lesson
   )
   progress.is_completed = True
   progress.save()
 
-  # البحث عن الدرس التالي
   all_lessons = list(course.lessons.all().order_by('order'))
   try:
     current_index = all_lessons.index(lesson)
@@ -530,3 +539,24 @@ def mark_lesson_complete(request, lesson_pk):
     next_url = reverse('course_detail', args=[course.pk])
 
   return JsonResponse({'status': 'success', 'next_url': next_url})
+
+
+@login_required
+def save_video_progress(request, lesson_pk):
+  """دالة جديدة لحفظ الثواني التي شاهدها الطالب دورياً عبر AJAX"""
+  if request.method == 'POST':
+    lesson = get_object_or_404(Lesson, pk=lesson_pk)
+    try:
+      data = json.loads(request.body)
+      current_time = float(data.get('current_time', 0))
+
+      progress, _ = LessonProgress.objects.get_or_create(
+          student=request.user, lesson=lesson
+      )
+      progress.watched_seconds = current_time
+      progress.save()
+
+      return JsonResponse({'status': 'success'})
+    except Exception as e:
+      return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+  return JsonResponse({'status': 'invalid method'}, status=405)

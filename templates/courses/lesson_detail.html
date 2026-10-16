@@ -166,14 +166,15 @@
     </div>
 </div>
 
-<!-- نظام الحماية ومنطق تتبع الـ 20 ثانية الأخيرة لتحديث الحالة -->
+<!-- نظام الحماية ومنطق تتبع الـ 20 ثانية الأخيرة وتحديث وقت التوقف لحظياً عند الخروج -->
+<!-- نظام الحماية ومنطق تتبع الـ 20 ثانية الأخيرة وتحديث وقت التوقف لحظياً عند الخروج -->
 <script>
-    document.addEventListener('DOMContentLoaded', (event) => {
+    document.addEventListener('DOMContentLoaded', function() {
         // 1. منع النقر بزر الماوس الأيمن والاختصارات لحماية المحتوى
-        document.addEventListener('contextmenu', e => e.preventDefault());
-        document.addEventListener('dragstart', e => e.preventDefault());
+        document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+        document.addEventListener('dragstart', function(e) { e.preventDefault(); });
 
-        document.addEventListener('keydown', (e) => {
+        document.addEventListener('keydown', function(e) {
             if (
                 e.key === 'F12' || 
                 (e.ctrlKey && e.shiftKey && ['I', 'J', 'C', 'i', 'j', 'c'].includes(e.key)) || 
@@ -185,42 +186,111 @@
             }
         });
 
-        // 2. مراقبة الـ 20 ثانية الأخيرة للفيديو
+        // 2. إدارة تشغيل الفيديو واسترجاع نقطة التوقف وحفظها دورياً وعن الخروج الفوري
         const videoElement = document.getElementById('my-local-video');
         const completeBtn = document.getElementById('complete-lesson-btn');
         let isCompletedSent = false;
 
-        if (videoElement && completeBtn) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const startTimeParam = urlParams.get('t');
+        const savedSeconds = parseFloat("{{ saved_seconds|default:0.0 }}");
+        const progressUrl = "{% url 'save_video_progress' lesson.id %}";
+        const completeUrl = "{% url 'mark_lesson_complete' lesson.id %}";
+        const csrfToken = "{{ csrf_token }}";
+
+        if (videoElement) {
+            let hasRestoredTime = false;
+            
+            const restoreTime = function() {
+                if (!hasRestoredTime) {
+                    if (startTimeParam && !isNaN(parseFloat(startTimeParam))) {
+                        videoElement.currentTime = parseFloat(startTimeParam);
+                        hasRestoredTime = true;
+                    } else if (savedSeconds > 0) {
+                        videoElement.currentTime = savedSeconds;
+                        hasRestoredTime = true;
+                    }
+                }
+            };
+
+            videoElement.addEventListener('loadedmetadata', restoreTime);
+            videoElement.addEventListener('canplay', restoreTime);
+
+            let lastSavedTime = 0;
+            
+            // دالة الإرسال لحفظ الوقت
+            const sendProgress = function(isBeacon = false) {
+                if (!videoElement || isNaN(videoElement.currentTime)) return;
+                
+                const payload = JSON.stringify({ current_time: videoElement.currentTime });
+                
+                if (isBeacon && navigator.sendBeacon) {
+                    const blob = new Blob([payload], { type: 'application/json' });
+                    navigator.sendBeacon(progressUrl, blob);
+                } else {
+                    fetch(progressUrl, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrfToken,
+                            'Content-Type': 'application/json'
+                        },
+                        body: payload,
+                        keepalive: true
+                    }).catch(function(err) {
+                        console.log('Progress save error:', err);
+                    });
+                }
+            };
+
+            // حفظ الوقت كل 5 ثوانٍ أثناء التشغيل
             videoElement.addEventListener('timeupdate', function() {
+                if (!videoElement.paused && Math.abs(videoElement.currentTime - lastSavedTime) > 5) {
+                    lastSavedTime = videoElement.currentTime;
+                    sendProgress(false);
+                }
+
+                // مراقبة الـ 20 ثانية الأخيرة لإتمام الدرس
                 if (!isNaN(videoElement.duration) && !isCompletedSent) {
                     const timeLeft = videoElement.duration - videoElement.currentTime;
-                    // إذا بقي 20 ثانية أو انتهى الفيديو
                     if (timeLeft <= 20 || videoElement.ended) {
                         isCompletedSent = true;
                         
-                        // إرسال طلب إتمام الدرس للخلفية تلقائياً لفتح القفل عن الدرس التالي
-                        fetch("{% url 'mark_lesson_complete' lesson.id %}", {
+                        fetch(completeUrl, {
                             method: 'POST',
                             headers: {
-                                'X-CSRFToken': '{{ csrf_token }}',
+                                'X-CSRFToken': csrfToken,
                                 'Content-Type': 'application/json'
                             }
                         })
-                        .then(response => response.json())
-                        .then(data => {
-                            if(data.status === 'success') {
-                                completeBtn.disabled = false;
-                                completeBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                                completeBtn.classList.add('hover:scale-105', 'shadow-lg');
-                                completeBtn.innerText = 'تم إتمام الدرس بنجاح! الانتقال للتالي 🚀';
+                        .then(function(response) { return response.json(); })
+                        .then(function(data) {
+                            if (data && data.status === 'success') {
+                                if (completeBtn) {
+                                    completeBtn.disabled = false;
+                                    completeBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                                    completeBtn.classList.add('hover:scale-105', 'shadow-lg');
+                                    completeBtn.innerText = 'تم إتمام الدرس بنجاح! الانتقال للتالي 🚀';
+                                }
                             }
+                        }).catch(function(err) {
+                            console.log('Complete error:', err);
                         });
                     }
                 }
             });
+
+            // حفظ الوقت فوراً عند مغادرة الصفحة أو إغلاقها أو التبديل لتبويب آخر
+            window.addEventListener('beforeunload', function() {
+                sendProgress(true);
+            });
+
+            document.addEventListener('visibilitychange', function() {
+                if (document.visibilityState === 'hidden') {
+                    sendProgress(false);
+                }
+            });
         } else if (completeBtn) {
-            // للروابط الخارجية يتم فتح الزر تلقائياً
-            setTimeout(() => {
+            setTimeout(function() {
                 completeBtn.disabled = false;
                 completeBtn.classList.remove('opacity-50', 'cursor-not-allowed');
             }, 10000);
@@ -230,20 +300,22 @@
         if (completeBtn) {
             completeBtn.addEventListener('click', function(e) {
                 e.preventDefault();
-                fetch("{% url 'mark_lesson_complete' lesson.id %}", {
+                fetch(completeUrl, {
                     method: 'POST',
                     headers: {
-                        'X-CSRFToken': '{{ csrf_token }}',
+                        'X-CSRFToken': csrfToken,
                         'Content-Type': 'application/json'
                     }
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if(data.status === 'success') {
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    if (data && data.status === 'success') {
                         window.location.href = data.next_url;
                     } else {
                         alert('يجب إتمام مشاهدة الدرس أولاً.');
                     }
+                }).catch(function(err) {
+                    console.log('Navigation error:', err);
                 });
             });
         }

@@ -139,6 +139,7 @@ class LessonProgress(models.Model):
       Lesson, on_delete=models.CASCADE, related_name='progress'
   )
   is_completed = models.BooleanField(default=False)
+  watched_seconds = models.FloatField(default=0.0)
   completed_at = models.DateTimeField(auto_now=True)
 
   class Meta:
