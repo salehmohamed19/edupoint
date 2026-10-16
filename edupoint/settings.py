@@ -137,3 +137,21 @@ ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_EMAIL_VERIFICATION = False
+
+# --- إعدادات ربط تسجيل الدخول عبر Google (Allauth Google Provider) ---
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': os.environ.get('GOOGLE_CLIENT_ID', 'ضع_الـ_Client_ID_هنا_لو_لم تستخدم البيئة'),
+            'secret': os.environ.get('GOOGLE_CLIENT_SECRET', 'ضع_الـ_Secret_هنا'),
+            'key': ''
+        },
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    }
+}
