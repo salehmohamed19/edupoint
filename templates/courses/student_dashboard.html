@@ -1,31 +1,33 @@
 {% extends 'base.html' %}
+{% block title %}كورساتي - EduPoint{% endblock %}
+
 {% block content %}
 <div class="space-y-8">
-    <div class="bg-gradient-to-r from-indigo-600 to-violet-600 rounded-3xl p-8 text-white shadow-lg shadow-indigo-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-            <h1 class="text-3xl font-black mb-2">أهلاً بك، {{ request.user.username }} 🎓</h1>
-            <p class="text-indigo-100 font-medium">هنا جميع الكورسات التي تشارك بها وتتابع دراستها.</p>
+    <div class="bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 rounded-3xl p-6 sm:p-10 text-white shadow-xl shadow-indigo-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div class="space-y-2">
+            <h1 class="text-2xl sm:text-3xl font-black">أهلاً بك، {{ request.user.username }} 🎓</h1>
+            <p class="text-indigo-100 text-xs sm:text-sm font-semibold">هنا جميع الكورسات التي تشارك بها وتتابع دراستها.</p>
         </div>
-        <a href="{% url 'course_list' %}" class="bg-white text-indigo-600 font-bold px-6 py-3 rounded-2xl hover:bg-slate-50 transition shadow-md">
+        <a href="{% url 'course_list' %}" class="bg-white text-indigo-600 font-bold px-6 py-3.5 rounded-2xl hover:bg-slate-50 transition shadow-lg text-xs sm:text-sm whitespace-nowrap">
             تصفح المزيد من الكورسات 🔍
         </a>
     </div>
 
-    <h2 class="text-2xl font-black text-slate-900">كورساتي المسجل بها</h2>
+    <h2 class="text-xl sm:text-2xl font-black text-slate-900">كورساتي المسجل بها</h2>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
         {% for enrollment in enrollments %}
         <div class="bg-white rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden border border-slate-100 flex flex-col justify-between group">
-            <div class="p-7">
+            <div class="p-6 sm:p-7">
                 <div class="flex justify-between items-center mb-4">
-                    <span class="text-xs font-bold px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">مشترك بنجاح ✓</span>
-                    <span class="text-xs text-slate-400 font-semibold">المدرس: {% if course.instructor.userprofile.full_name %}{{ course.instructor.userprofile.full_name }}{% else %}{{ course.instructor.username }}{% endif %}</span>
+                    <span class="text-xs font-extrabold px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">مشترك بنجاح ✓</span>
+                    <span class="text-xs text-slate-400 font-semibold">المدرس: {% if enrollment.course.instructor.userprofile.full_name %}{{ enrollment.course.instructor.userprofile.full_name }}{% else %}{{ enrollment.course.instructor.username }}{% endif %}</span>
                 </div>
-                <h3 class="text-xl font-bold text-slate-800 mb-3 group-hover:text-indigo-600 transition">{{ enrollment.course.title }}</h3>
-                <p class="text-slate-500 text-sm leading-relaxed line-clamp-3 mb-6">{{ enrollment.course.description }}</p>
+                <h3 class="text-lg sm:text-xl font-bold text-slate-800 mb-2.5 group-hover:text-indigo-600 transition">{{ enrollment.course.title }}</h3>
+                <p class="text-slate-500 text-xs sm:text-sm leading-relaxed line-clamp-3 mb-6 font-semibold">{{ enrollment.course.description }}</p>
             </div>
-            <div class="px-7 pb-7 pt-0">
-                <a href="{% url 'course_detail' enrollment.course.id %}" class="block text-center w-full bg-indigo-600 text-white font-bold py-3 rounded-2xl hover:bg-indigo-700 transition shadow-md shadow-indigo-100">
+            <div class="px-6 pb-6 sm:px-7 sm:pb-7 pt-0">
+                <a href="{% url 'course_detail' enrollment.course.id %}" class="block text-center w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-2xl transition duration-200 shadow-md shadow-indigo-100 text-xs sm:text-sm">
                     متابعة الدروس 📺
                 </a>
             </div>
@@ -33,9 +35,9 @@
         {% empty %}
         <div class="col-span-full text-center py-20 bg-white rounded-3xl border border-slate-100 shadow-sm">
             <div class="text-5xl mb-4">📚</div>
-            <p class="text-slate-700 font-bold text-lg mb-2">لم تقم بالاشتراك في أي كورس بعد.</p>
-            <p class="text-slate-400 text-sm mb-6">استكشف الكورسات المتاحة وابدأ رحلة التعلم اليوم!</p>
-            <a href="{% url 'course_list' %}" class="inline-block bg-indigo-600 text-white font-bold px-8 py-3 rounded-2xl hover:bg-indigo-700 transition shadow-md">
+            <p class="text-slate-700 font-bold text-base sm:text-lg mb-2">لم تقم بالاشتراك في أي كورس بعد.</p>
+            <p class="text-slate-400 text-xs sm:text-sm font-semibold mb-6">استكشف الكورسات المتاحة وابدأ رحلة التعلم اليوم!</p>
+            <a href="{% url 'course_list' %}" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 py-3.5 rounded-2xl transition shadow-md text-xs sm:text-sm">
                 تصفح الكورسات الآن 🚀
             </a>
         </div>

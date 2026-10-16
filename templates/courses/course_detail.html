@@ -1,117 +1,120 @@
 {% extends 'base.html' %}
+{% block title %}{{ course.title }} - EduPoint{% endblock %}
+
 {% block content %}
-<div class="max-w-4xl mx-auto space-y-6">
+<div class="max-w-4xl mx-auto space-y-6 sm:space-y-8">
     
     <!-- بطاقة تفاصيل الكورس الرئيسية -->
-    <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
+    <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 p-6 sm:p-8">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b border-slate-100 pb-6 gap-4">
             <div>
-                <h1 class="text-3xl font-black text-slate-900 mb-2">{{ course.title }}</h1>
-                <p class="text-slate-500 font-medium text-sm">المدرس المسؤول: <span class="text-slate-700 font-bold">{% if course.instructor.userprofile.full_name %}{{ course.instructor.userprofile.full_name }}{% else %}{{ course.instructor.username }}{% endif %}</span></p>
+                <h1 class="text-2xl sm:text-3xl font-black text-slate-900 mb-2">{{ course.title }}</h1>
+                <p class="text-slate-500 font-semibold text-xs sm:text-sm">المدرس المسؤول: <span class="text-slate-700 font-bold">{% if course.instructor.userprofile.full_name %}{{ course.instructor.userprofile.full_name }}{% else %}{{ course.instructor.username }}{% endif %}</span></p>
             </div>
             
-            <div class="flex items-center gap-3">
-                <span class="text-base font-extrabold px-4 py-2 rounded-xl {% if course.is_free %}bg-emerald-50 text-emerald-600 border border-emerald-100{% else %}bg-indigo-50 text-indigo-600 border border-indigo-100{% endif %}">
+            <div class="flex flex-wrap items-center gap-3">
+                <span class="text-xs sm:text-sm font-extrabold px-4 py-2 rounded-xl {% if course.is_free %}bg-emerald-50 text-emerald-600 border border-emerald-100{% else %}bg-indigo-50 text-indigo-600 border border-indigo-100{% endif %}">
                     {% if course.is_free %}مجاني بالكامل{% else %}السعر: {{ course.price }} جنيه{% endif %}
                 </span>
                 
                 {% if user == course.instructor %}
-                    <a href="{% url 'add_lesson' course.id %}" class="bg-emerald-600 text-white text-sm px-4 py-2.5 rounded-xl font-bold hover:bg-emerald-700 transition shadow-md">➕ إضافة درس</a>
+                    <a href="{% url 'add_lesson' course.id %}" class="bg-emerald-600 text-white text-xs sm:text-sm px-4 py-2.5 rounded-xl font-bold hover:bg-emerald-700 transition shadow-md flex items-center gap-1.5">
+                        <span>➕</span>
+                        <span>إضافة درس</span>
+                    </a>
                 {% endif %}
             </div>
         </div>
 
         <div class="mb-8">
-            <h3 class="text-lg font-bold text-slate-800 mb-3">وصف الكورس:</h3>
-            <p class="text-slate-600 leading-relaxed font-medium">{{ course.description }}</p>
+            <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-3">وصف الكورس:</h3>
+            <p class="text-slate-600 leading-relaxed text-xs sm:text-sm font-semibold whitespace-pre-line">{{ course.description }}</p>
         </div>
 
-        <!-- قسم حالة الاشتراك وزر الدفع أو التسجيل -->
+        <!-- قسم حالة الاشتراك -->
         {% if not is_enrolled %}
-        <div class="bg-gradient-to-r from-indigo-50 to-violet-50 border border-indigo-100 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="bg-gradient-to-r from-indigo-50 via-purple-50 to-violet-50 border border-indigo-100 rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
             <div>
-                <h4 class="text-slate-900 font-bold text-lg mb-1">أنت غير مشترك في هذا الكورس بعد!</h4>
-                <p class="text-slate-500 text-sm">اشترك الآن لتتمكن من الوصول الكامل لجميع الدروس والفيديوهات التعليمية.</p>
+                <h4 class="text-slate-900 font-bold text-base sm:text-lg mb-1">أنت غير مشترك في هذا الكورس بعد!</h4>
+                <p class="text-slate-500 text-xs sm:text-sm font-semibold">اشترك الآن لتتمكن من الوصول الكامل لجميع الدروس والفيديوهات التعليمية.</p>
             </div>
             
             {% if course.is_free %}
-                <a href="{% url 'enroll_free_course' course.id %}" class="whitespace-nowrap bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold px-6 py-3 rounded-xl hover:opacity-95 transition shadow-lg shadow-emerald-200">
+                <a href="{% url 'enroll_free_course' course.id %}" class="whitespace-nowrap bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold px-6 py-3 rounded-2xl hover:opacity-95 transition shadow-lg shadow-emerald-200 text-xs sm:text-sm">
                     انضم للكورس مجاناً 🚀
                 </a>
             {% else %}
-                <a href="{% url 'initiate_payment' course.id %}" class="whitespace-nowrap bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold px-6 py-3 rounded-xl hover:opacity-95 transition shadow-lg shadow-indigo-200">
-                    شراء الكورس واشترك الآن 💳
+                <a href="{% url 'initiate_payment' course.id %}" class="whitespace-nowrap bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold px-6 py-3 rounded-2xl hover:opacity-95 transition shadow-lg shadow-indigo-200 text-xs sm:text-sm">
+                    شراء واشترك الآن 💳
                 </a>
             {% endif %}
         </div>
         {% else %}
         <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p class="text-emerald-700 font-bold text-sm">✓ أنت مسجل بالفعل في هذا الكورس وتمتلك حق الوصول الكامل لجميع الدروس.</p>
-            <a href="{% url 'view_certificate' course.id %}" class="whitespace-nowrap bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold px-5 py-2.5 rounded-xl hover:opacity-95 transition shadow-md text-sm">
+            <p class="text-emerald-700 font-bold text-xs sm:text-sm">✓ أنت مسجل بالفعل في هذا الكورس وتمتلك حق الوصول الكامل لجميع الدروس.</p>
+            <a href="{% url 'view_certificate' course.id %}" class="whitespace-nowrap bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold px-5 py-2.5 rounded-2xl hover:opacity-95 transition shadow-md text-xs sm:text-sm">
                 عرض شهادة الإتمام 🏆
             </a>
         </div>
         {% endif %}
     </div>
 
-    <!-- قسم محتوى الكورس والدروس مع تطبيق القفل والتتابع بدقة -->
-    <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
-        <h3 class="text-2xl font-black text-slate-900 mb-6">محتوى الكورس والدروس 📚</h3>
+    <!-- قسم محتوى الكورس والدروس -->
+    <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 p-6 sm:p-8">
+        <h3 class="text-xl sm:text-2xl font-black text-slate-900 mb-6">محتوى الكورس والدروس 📚</h3>
         
         {% if is_enrolled %}
-            <div class="space-y-4">
+            <div class="space-y-3 sm:space-y-4">
                 {% for data in lessons_data %}
                     {% if data.is_unlocked %}
-                        <!-- درس متاح ومفتوح -->
-                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 hover:border-indigo-200 transition">
                             <div class="flex items-center gap-3">
-                                <span class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 font-bold flex items-center justify-center text-xs">{{ data.lesson.order }}</span>
-                                <span class="font-bold text-slate-800">{{ data.lesson.title }}</span>
+                                <span class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 font-bold flex items-center justify-center text-xs shrink-0">{{ data.lesson.order }}</span>
+                                <span class="font-bold text-slate-800 text-sm">{{ data.lesson.title }}</span>
                             </div>
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
                                 {% if data.is_completed %}
-                                    <span class="text-xs text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-lg font-bold">✓ مكتمل</span>
+                                    <span class="text-[11px] text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-xl font-bold border border-emerald-100">✓ مكتمل</span>
                                 {% endif %}
-                                <a href="{% url 'lesson_detail' course.id data.lesson.id %}" class="bg-indigo-600 text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-indigo-700 transition shadow-sm">
+                                <a href="{% url 'lesson_detail' course.id data.lesson.id %}" class="bg-indigo-600 text-white text-xs sm:text-sm font-bold px-5 py-2.5 rounded-2xl hover:bg-indigo-700 transition shadow-sm">
                                     مشاهدة الدرس 📺
                                 </a>
                             </div>
                         </div>
                     {% else %}
-                        <!-- درس مقفل -->
                         <div class="bg-slate-100/70 p-4 rounded-2xl border border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 opacity-75 cursor-not-allowed" onclick="alert('عذراً، هذا الدرس مقفل. يجب مشاهدة الدرس السابق حتى نهايته أولاً لفتح قفله 🔒');">
                             <div class="flex items-center gap-3">
-                                <span class="w-8 h-8 rounded-xl bg-slate-200 text-slate-500 font-bold flex items-center justify-center text-xs">{{ data.lesson.order }}</span>
-                                <span class="font-bold text-slate-400">{{ data.lesson.title }}</span>
+                                <span class="w-8 h-8 rounded-xl bg-slate-200 text-slate-500 font-bold flex items-center justify-center text-xs shrink-0">{{ data.lesson.order }}</span>
+                                <span class="font-bold text-slate-400 text-sm">{{ data.lesson.title }}</span>
                             </div>
-                            <span class="text-xs bg-slate-200 text-slate-500 px-3 py-1.5 rounded-lg font-bold">🔒 مقفل</span>
+                            <span class="text-xs bg-slate-200 text-slate-500 px-3 py-1.5 rounded-xl font-bold">🔒 مقفل</span>
                         </div>
                     {% endif %}
                 {% empty %}
-                <div class="text-center py-8 text-slate-400 font-medium">
+                <div class="text-center py-8 text-slate-400 font-semibold text-sm">
                     لم يتم إضافة دروس لهذا الكورس حتى الآن. ترقبوا المحتوى قريباً!
                 </div>
                 {% endfor %}
             </div>
         {% else %}
-            <div class="text-center py-10 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-                <p class="text-slate-400 font-bold mb-2">محتوى الدروس مقفل 🔒</p>
-                <p class="text-slate-400 text-sm">يجب إتمام الاشتراك (أو الشراء) لتتمكن من استعراض ومتابعة الدروس.</p>
+            <div class="text-center py-10 bg-slate-50/80 rounded-2xl border border-dashed border-slate-200">
+                <p class="text-slate-600 font-bold mb-1 text-sm">محتوى الدروس مقفل 🔒</p>
+                <p class="text-slate-400 text-xs sm:text-sm font-semibold">يجب إتمام الاشتراك (أو الشراء) لتتمكن من استعراض ومتابعة الدروس.</p>
             </div>
         {% endif %}
     </div>
 
     <!-- قسم التقييمات والتعليقات -->
-    <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
-        <h3 class="text-2xl font-black text-slate-900 mb-6">تقييمات وآراء الطلاب ⭐</h3>
+    <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 p-6 sm:p-8">
+        <h3 class="text-xl sm:text-2xl font-black text-slate-900 mb-6">تقييمات وآراء الطلاب ⭐</h3>
 
         {% if is_enrolled and user != course.instructor %}
-        <form method="POST" action="{% url 'add_review' course.id %}" class="bg-slate-50 p-6 rounded-2xl border border-slate-100 mb-8 space-y-4">
+        <form method="POST" action="{% url 'add_review' course.id %}" class="bg-slate-50 p-5 sm:p-6 rounded-2xl border border-slate-100 mb-8 space-y-4">
             {% csrf_token %}
-            <h4 class="font-bold text-slate-800 text-sm">أضف تقييمك ورأيك في الكورس:</h4>
-            <div class="flex items-center gap-3">
-                <label class="text-sm font-bold text-slate-600">التقييم:</label>
-                <select name="rating" class="bg-white border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500">
+            <h4 class="font-bold text-slate-800 text-xs sm:text-sm">أضف تقييمك ورأيك في الكورس:</h4>
+            <div class="flex flex-wrap items-center gap-3">
+                <label class="text-xs sm:text-sm font-bold text-slate-600">التقييم:</label>
+                <select name="rating" class="bg-white border border-slate-200/80 rounded-xl px-4 py-2 text-xs sm:text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500">
                     <option value="5">⭐⭐⭐⭐⭐ (5/5 ممتاز)</option>
                     <option value="4">⭐⭐⭐⭐ (4/5 جيد جداً)</option>
                     <option value="3">⭐⭐⭐ (3/5 جيد)</option>
@@ -120,9 +123,9 @@
                 </select>
             </div>
             <div>
-                <textarea name="comment" rows="3" placeholder="اكتب تعليقك وتجربتك مع الكورس..." required class="w-full bg-white border border-slate-200 rounded-xl p-4 text-sm font-medium text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500 resize-none"></textarea>
+                <textarea name="comment" rows="3" placeholder="اكتب تعليقك وتجربتك مع الكورس..." required class="w-full bg-white border border-slate-200/80 rounded-2xl p-4 text-xs sm:text-sm font-medium text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500 resize-none"></textarea>
             </div>
-            <button type="submit" class="bg-indigo-600 text-white font-bold px-6 py-2.5 rounded-xl text-sm hover:bg-indigo-700 transition shadow-sm">
+            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2.5 rounded-2xl text-xs sm:text-sm transition shadow-sm">
                 إرسال التقييم ✍️
             </button>
         </form>
@@ -130,20 +133,20 @@
 
         <div class="space-y-4">
             {% for review in course.reviews.all %}
-            <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div class="bg-slate-50/80 p-4 sm:p-5 rounded-2xl border border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <div class="flex items-center gap-2 mb-1">
-                        <span class="font-bold text-slate-800 text-sm">👤 {{ review.student.username }}</span>
+                        <span class="font-bold text-slate-800 text-xs sm:text-sm">👤 {{ review.student.username }}</span>
                         <span class="text-xs text-amber-500 font-bold">
                             {% if review.rating == 5 %}⭐⭐⭐⭐⭐{% elif review.rating == 4 %}⭐⭐⭐⭐{% elif review.rating == 3 %}⭐⭐⭐{% elif review.rating == 2 %}⭐⭐{% else %}⭐{% endif %}
                         </span>
                     </div>
-                    <p class="text-slate-600 text-sm font-medium">{{ review.comment }}</p>
+                    <p class="text-slate-600 text-xs sm:text-sm font-medium">{{ review.comment }}</p>
                 </div>
-                <span class="text-xs text-slate-400 font-semibold">{{ review.created_at|date:"Y-m-d" }}</span>
+                <span class="text-[11px] text-slate-400 font-semibold">{{ review.created_at|date:"Y-m-d" }}</span>
             </div>
             {% empty %}
-            <div class="text-center py-8 text-slate-400 font-medium bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+            <div class="text-center py-8 text-slate-400 font-semibold text-xs sm:text-sm bg-slate-50/60 rounded-2xl border border-dashed border-slate-200">
                 لا توجد تقييمات لهذا الكورس حتى الآن. كن أول من يقيّم!
             </div>
             {% endfor %}

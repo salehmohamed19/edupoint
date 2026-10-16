@@ -3,87 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}منصة إديوبوينت التعليمية{% endblock %}</title>
+    <title>{% block title %}منصة إديوبوينت التعليمية - EduPoint{% endblock %}</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Alpine.js لعمل القائمة المنسدلة والتنبيهات بسلاسة -->
+    <!-- Alpine.js لعمل القوائم والتنبيهات بسلاسة -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Cairo', sans-serif; }
+        /* تخصيص شريط التمرير (Custom Scrollbar) */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 flex flex-col min-h-screen selection:bg-indigo-500 selection:text-white">
+<body class="bg-slate-50 text-slate-800 flex flex-col min-h-screen selection:bg-indigo-500 selection:text-white antialiased">
 
-    <!-- Navbar الاحترافي الفخم -->
-    <nav class="bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-100 sticky top-0 z-50 transition-all">
+    <!-- Navbar الاحترافي التفاعلي مع دعم الشاشات الصغيرة -->
+    <nav class="bg-white/80 backdrop-blur-lg shadow-sm border-b border-slate-100 sticky top-0 z-50 transition-all duration-300" x-data="{ mobileMenuOpen: false }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-20 items-center">
                 <!-- الشعار -->
                 <div class="flex items-center space-x-reverse space-x-3">
-                    <a href="{% url 'course_list' %}" class="flex items-center space-x-reverse space-x-2 group">
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white text-xl font-black shadow-md shadow-indigo-200 group-hover:scale-105 transition">
+                    <a href="{% url 'course_list' %}" class="flex items-center space-x-reverse space-x-2.5 group">
+                        <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-indigo-200 group-hover:scale-105 group-hover:rotate-3 transition duration-300">
                             E
                         </div>
-                        <span class="text-2xl font-black bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">EduPoint</span>
+                        <span class="text-2xl font-black bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 bg-clip-text text-transparent tracking-tight">EduPoint</span>
                     </a>
                 </div>
 
-                <!-- الروابط وأزرار التحكم -->
-                <div class="flex items-center space-x-reverse space-x-6">
-                    <a href="{% url 'course_list' %}" class="text-slate-600 hover:text-indigo-600 font-semibold transition">جميع الكورسات</a>
+                <!-- الروابط وأزرار التحكم لشاشات الكمبيوتر والتابلت -->
+                <div class="hidden md:flex items-center space-x-reverse space-x-6">
+                    <a href="{% url 'course_list' %}" class="text-slate-600 hover:text-indigo-600 font-bold text-sm transition-colors duration-200">جميع الكورسات</a>
                     
                     {% if user.is_authenticated %}
                         {% if user.userprofile.user_type == 'instructor' %}
-                            <a href="{% url 'instructor_dashboard' %}" class="text-slate-600 hover:text-indigo-600 font-semibold transition">لوحة المدرس</a>
-                            <a href="{% url 'create_course' %}" class="bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-5 py-2.5 rounded-xl hover:from-indigo-700 hover:to-violet-700 transition shadow-lg shadow-indigo-200 text-sm font-bold flex items-center gap-1.5">
-                                <span>➕ إضافة كورس</span>
+                            <a href="{% url 'instructor_dashboard' %}" class="text-slate-600 hover:text-indigo-600 font-bold text-sm transition-colors duration-200">لوحة المدرس</a>
+                            <a href="{% url 'create_course' %}" class="bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-5 py-2.5 rounded-2xl hover:from-indigo-700 hover:to-violet-700 transition duration-300 shadow-md shadow-indigo-200 hover:shadow-lg hover:shadow-indigo-300 text-sm font-bold flex items-center gap-2 group">
+                                <span class="group-hover:rotate-90 transition duration-300">➕</span>
+                                <span>إضافة كورس</span>
                             </a>
                         {% else %}
-                            <a href="{% url 'student_dashboard' %}" class="text-slate-600 hover:text-indigo-600 font-semibold transition">كورساتي</a>
+                            <a href="{% url 'student_dashboard' %}" class="text-slate-600 hover:text-indigo-600 font-bold text-sm transition-colors duration-200">كورساتي</a>
                         {% endif %}
                         
                         <div class="h-6 w-[1px] bg-slate-200 mx-1"></div>
 
-                        <!-- قائمة البروفايل المنسدلة (Dropdown Menu) -->
+                        <!-- قائمة البروفايل المنسدلة -->
                         <div class="relative" x-data="{ open: false }">
-                            <button @click="open = !open" @click.away="open = false" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm px-4 py-2.5 rounded-2xl transition outline-none">
-                                <span>👤 {{ user.username }}</span>
-                                <svg class="w-4 h-4 text-slate-500 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            <button @click="open = !open" @click.away="open = false" class="flex items-center gap-2.5 bg-slate-100/80 hover:bg-slate-200/80 text-slate-800 font-bold text-sm px-4 py-2.5 rounded-2xl transition duration-200 outline-none border border-slate-200/50">
+                                <div class="w-7 h-7 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-xs font-black">
+                                    {{ user.username|slice:":1"|upper }}
+                                </div>
+                                <span class="truncate max-w-[120px]">{{ user.username }}</span>
+                                <svg class="w-4 h-4 text-slate-500 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
 
-                            <!-- القائمة التي تظهر عند الضغط -->
+                            <!-- القائمة المنسدلة -->
                             <div x-show="open" 
                                  x-transition:enter="transition ease-out duration-200" 
-                                 x-transition:enter-start="opacity-0 scale-95" 
-                                 x-transition:enter-end="opacity-100 scale-100" 
+                                 x-transition:enter-start="opacity-0 translate-y-2 scale-95" 
+                                 x-transition:enter-end="opacity-100 translate-y-0 scale-100" 
                                  x-transition:leave="transition ease-in duration-150" 
-                                 x-transition:leave-start="opacity-100 scale-100" 
-                                 x-transition:leave-end="opacity-0 scale-95" 
-                                 class="absolute left-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50" style="display: none;">
+                                 x-transition:leave-start="opacity-100 translate-y-0 scale-100" 
+                                 x-transition:leave-end="opacity-0 translate-y-2 scale-95" 
+                                 class="absolute left-0 mt-3 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 py-2.5 z-50" style="display: none;">
                                  
                                 <div class="px-4 py-2 border-b border-slate-100 mb-1">
-                                    <p class="text-xs text-slate-400 font-medium">حساب مسجل بـ</p>
-                                    <p class="text-sm font-bold text-slate-800 truncate">{{ user.username }}</p>
+                                    <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">حساب مسجل بـ</p>
+                                    <p class="text-sm font-black text-slate-800 truncate">{{ user.username }}</p>
                                 </div>
 
-                                <!-- صفحة البروفايل تحت اسم المستخدم وفوق تسجيل الخروج -->
-                                <a href="{% url 'profile' %}" class="flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 transition">
-                                    <span>⚙️ إعدادات البروفايل</span>
+                                <a href="{% url 'profile' %}" class="flex items-center gap-2.5 px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-indigo-50/60 hover:text-indigo-600 transition duration-150">
+                                    <span>⚙️</span>
+                                    <span>إعدادات البروفايل</span>
                                 </a>
 
-                                <a href="{% url 'logout' %}" class="flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-rose-600 hover:bg-rose-50 transition border-t border-slate-50">
-                                    <span>🚪 تسجيل الخروج</span>
+                                <a href="{% url 'logout' %}" class="flex items-center gap-2.5 px-4 py-2.5 text-sm font-bold text-rose-600 hover:bg-rose-50 transition duration-150 border-t border-slate-100 mt-1">
+                                    <span>🚪</span>
+                                    <span>تسجيل الخروج</span>
                                 </a>
                             </div>
                         </div>
 
                     {% else %}
-                        <a href="{% url 'login' %}" class="text-slate-700 hover:text-indigo-600 font-semibold text-sm px-4 py-2 transition">دخول</a>
-                        <a href="{% url 'register' %}" class="bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-5 py-2.5 rounded-xl hover:from-indigo-700 hover:to-violet-700 transition shadow-lg shadow-indigo-200 text-sm font-bold">حساب جديد</a>
+                        <a href="{% url 'login' %}" class="text-slate-700 hover:text-indigo-600 font-bold text-sm px-4 py-2 transition">دخول</a>
+                        <a href="{% url 'register' %}" class="bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-5 py-2.5 rounded-2xl hover:from-indigo-700 hover:to-violet-700 transition duration-300 shadow-md shadow-indigo-200 hover:shadow-lg text-sm font-bold">حساب جديد</a>
                     {% endif %}
                 </div>
+
+                <!-- زر القائمة للهواتف (Mobile Menu Button) -->
+                <div class="flex md:hidden items-center">
+                    <button @click="mobileMenuOpen = !mobileMenuOpen" class="p-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path x-show="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                            <path x-show="mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" style="display: none;"></path>
+                        </svg>
+                    </button>
+                </div>
             </div>
+        </div>
+
+        <!-- القائمة الجانبية للشاشات الصغيرة (Mobile Drawer) -->
+        <div x-show="mobileMenuOpen" 
+             x-transition:enter="transition ease-out duration-200" 
+             x-transition:enter-start="opacity-0 -translate-y-4" 
+             x-transition:enter-end="opacity-100 translate-y-0" 
+             x-transition:leave="transition ease-in duration-150" 
+             x-transition:leave-start="opacity-100 translate-y-0" 
+             x-transition:leave-end="opacity-0 -translate-y-4" 
+             class="md:hidden bg-white/95 backdrop-blur-lg border-b border-slate-100 px-4 pt-3 pb-6 space-y-3" style="display: none;">
+            
+            <a href="{% url 'course_list' %}" class="block py-2.5 px-4 rounded-xl text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 font-bold text-sm transition">📚 جميع الكورسات</a>
+            
+            {% if user.is_authenticated %}
+                {% if user.userprofile.user_type == 'instructor' %}
+                    <a href="{% url 'instructor_dashboard' %}" class="block py-2.5 px-4 rounded-xl text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 font-bold text-sm transition">📊 لوحة المدرس</a>
+                    <a href="{% url 'create_course' %}" class="block py-2.5 px-4 rounded-xl bg-indigo-600 text-white font-bold text-sm text-center shadow-md">➕ إضافة كورس جديد</a>
+                {% else %}
+                    <a href="{% url 'student_dashboard' %}" class="block py-2.5 px-4 rounded-xl text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 font-bold text-sm transition">🎓 كورساتي</a>
+                {% endif %}
+                
+                <a href="{% url 'profile' %}" class="block py-2.5 px-4 rounded-xl text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 font-bold text-sm transition">⚙️ إعدادات البروفايل ({{ user.username }})</a>
+                <a href="{% url 'logout' %}" class="block py-2.5 px-4 rounded-xl text-rose-600 hover:bg-rose-50 font-bold text-sm transition">🚪 تسجيل الخروج</a>
+            {% else %}
+                <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
+                    <a href="{% url 'login' %}" class="text-center py-2.5 rounded-xl border border-slate-200 text-slate-700 font-bold text-sm hover:bg-slate-50 transition">تسجيل دخول</a>
+                    <a href="{% url 'register' %}" class="text-center py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-sm hover:bg-indigo-700 transition shadow-md">حساب جديد</a>
+                </div>
+            {% endif %}
         </div>
     </nav>
 
@@ -92,15 +142,21 @@
         {% if messages %}
             <div class="space-y-3">
                 {% for message in messages %}
-                    <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)" 
-                         class="p-4 rounded-2xl shadow-sm border flex items-center justify-between text-sm font-bold transition-all duration-300 {% if message.tags == 'error' %}bg-rose-50 text-rose-700 border-rose-100{% elif message.tags == 'success' %}bg-emerald-50 text-emerald-700 border-emerald-100{% else %}bg-indigo-50 text-indigo-700 border-indigo-100{% endif %}">
-                        <div class="flex items-center gap-2">
-                            <span>
-                                {% if message.tags == 'error' %}❌{% elif message.tags == 'success' %}✅{% else %}ℹ️{% endif %}
+                    <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" 
+                         x-transition:enter="transition ease-out duration-300"
+                         x-transition:enter-start="opacity-0 -translate-y-2 scale-95"
+                         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                         x-transition:leave="transition ease-in duration-200"
+                         x-transition:leave-start="opacity-100 scale-100"
+                         x-transition:leave-end="opacity-0 scale-95"
+                         class="p-4 rounded-2xl shadow-sm border flex items-center justify-between text-sm font-bold transition-all duration-300 backdrop-blur-md {% if message.tags == 'error' %}bg-rose-50/90 text-rose-700 border-rose-200/60{% elif message.tags == 'success' %}bg-emerald-50/90 text-emerald-700 border-emerald-200/60{% else %}bg-indigo-50/90 text-indigo-700 border-indigo-200/60{% endif %}">
+                        <div class="flex items-center gap-3">
+                            <span class="text-base">
+                                {% if message.tags == 'error' %}🚨{% elif message.tags == 'success' %}🎉{% else %}💡{% endif %}
                             </span>
                             <span>{{ message }}</span>
                         </div>
-                        <button @click="show = false" class="text-slate-400 hover:text-slate-700 text-xs font-black">✕</button>
+                        <button @click="show = false" class="text-slate-400 hover:text-slate-700 text-xs font-black p-1 hover:bg-black/5 rounded-lg transition">✕</button>
                     </div>
                 {% endfor %}
             </div>
@@ -108,14 +164,17 @@
     </div>
 
     <!-- المحتوى الرئيسي للموقع -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer أنيق -->
-    <footer class="bg-white border-t border-slate-100 py-8 text-center text-slate-400 text-sm mt-auto">
-        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p class="font-medium">جميع الحقوق محفوظة &copy; 2026 EduPoint 🎓</p>
+    <!-- Footer أنيق ومتجاوب -->
+    <footer class="bg-white border-t border-slate-100 py-8 text-slate-400 text-sm mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-right">
+            <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-xs font-black">E</div>
+                <p class="font-bold text-slate-600">جميع الحقوق محفوظة &copy; 2026 EduPoint 🎓</p>
+            </div>
             <p class="text-xs text-slate-400">منصتك التعليمية المتكاملة لبناء المستقبل الرقمي</p>
         </div>
     </footer>

@@ -1,31 +1,37 @@
 {% extends 'base.html' %}
+{% block title %}إنشاء كورس جديد - EduPoint{% endblock %}
+
 {% block content %}
-<div class="max-w-xl mx-auto bg-white p-8 sm:p-10 rounded-3xl shadow-sm border border-slate-100 my-6">
+<div class="max-w-xl mx-auto bg-white p-6 sm:p-10 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 my-4 sm:my-8 transition-all">
     <div class="text-center mb-8">
-        <h1 class="text-3xl font-black text-slate-900 mb-2">إنشاء كورس تعليمي جديد 📚</h1>
-        <p class="text-slate-500 text-sm">شارك خبرتك وعلّم آلاف الطلاب حول العالم</p>
+        <div class="w-16 h-16 rounded-3xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto text-3xl mb-4 shadow-inner">
+            📚
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-black text-slate-900 mb-2">إنشاء كورس تعليمي جديد</h1>
+        <p class="text-slate-500 text-xs sm:text-sm font-semibold">شارك خبرتك وعلّم آلاف الطلاب حول العالم</p>
     </div>
 
     <form method="POST" class="space-y-5">
         {% csrf_token %}
         <div>
-            <label class="block text-sm font-bold text-slate-700 mb-2">عنوان الكورس</label>
-            <input type="text" name="title" placeholder="مثال: احتراف تطوير الويب بلغة بايثون" required class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition font-medium">
+            <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-2">عنوان الكورس</label>
+            <input type="text" name="title" placeholder="مثال: احتراف تطوير الويب بلغة بايثون" required class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3 text-slate-800 text-sm font-semibold focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 focus:bg-white outline-none transition duration-200">
         </div>
         <div>
-            <label class="block text-sm font-bold text-slate-700 mb-2">وصف الكورس</label>
-            <textarea name="description" rows="4" placeholder="اكتب نبذة تفصيلية عما سيستفيده الطالب في هذا الكورس..." required class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition font-medium resize-none"></textarea>
+            <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-2">وصف الكورس</label>
+            <textarea name="description" rows="4" placeholder="اكتب نبذة تفصيلية عما سيستفيده الطالب في هذا الكورس..." required class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3 text-slate-800 text-sm font-semibold focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 focus:bg-white outline-none transition duration-200 resize-none"></textarea>
         </div>
-        <div class="flex items-center space-x-reverse space-x-3 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-            <input type="checkbox" name="is_free" id="is_free" checked class="w-5 h-5 text-indigo-600 rounded-lg accent-indigo-600">
-            <label for="is_free" class="text-sm font-bold text-slate-700 cursor-pointer">هذا الكورس مجاني بالكامل</label>
+        <div class="flex items-center space-x-reverse space-x-3 bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
+            <input type="checkbox" name="is_free" id="is_free" checked class="w-5 h-5 text-indigo-600 rounded-lg accent-indigo-600 cursor-pointer">
+            <label for="is_free" class="text-xs sm:text-sm font-bold text-slate-700 cursor-pointer">هذا الكورس مجاني بالكامل</label>
         </div>
         <div>
-            <label class="block text-sm font-bold text-slate-700 mb-2">سعر الكورس (لو لم يكن مجانياً)</label>
-            <input type="number" step="0.01" name="price" value="0" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition font-medium">
+            <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-2">سعر الكورس (لو لم يكن مجانياً)</label>
+            <input type="number" step="0.01" name="price" value="0" class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3 text-slate-800 text-sm font-semibold focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 focus:bg-white outline-none transition duration-200">
         </div>
-        <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold py-3.5 rounded-2xl hover:opacity-95 transition shadow-lg shadow-indigo-200">
-            حفظ ونشر الكورس 🚀
+        <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold py-3.5 rounded-2xl transition duration-300 shadow-lg shadow-indigo-200 hover:shadow-indigo-300 text-sm flex items-center justify-center gap-2">
+            <span>حفظ ونشر الكورس</span>
+            <span>🚀</span>
         </button>
     </form>
 </div>

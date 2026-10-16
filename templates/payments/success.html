@@ -1,15 +1,17 @@
 {% extends 'base.html' %}
+{% block title %}حالة الاشتراك - EduPoint{% endblock %}
+
 {% block content %}
-<div class="max-w-md mx-auto bg-white p-8 rounded-3xl shadow-sm border border-slate-100 text-center space-y-6 my-10">
-    <div class="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-3xl flex items-center justify-center mx-auto text-3xl font-black shadow-inner">
+<div class="max-w-md mx-auto bg-white p-8 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 text-center space-y-6 my-8 sm:my-12">
+    <div class="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-3xl flex items-center justify-center mx-auto text-4xl font-black shadow-inner ring-4 ring-emerald-50/50">
         {% if payment.status == 'completed' %}✓{% else %}⏳{% endif %}
     </div>
     
-    <div>
-        <h1 class="text-2xl font-black text-slate-900 mb-2">
-            {% if payment.status == 'completed' %}تم تفعيل الاشتراك بنجاح!{% else %}تم استلام إيصال الدفع بنجاح{% endif %}
+    <div class="space-y-2">
+        <h1 class="text-2xl font-black text-slate-900">
+            {% if payment.status == 'completed' %}تم تفعيل الاشتراك بنجاح!🎉{% else %}تم استلام إيصال الدفع بنجاح{% endif %}
         </h1>
-        <p class="text-slate-500 text-sm leading-relaxed">
+        <p class="text-slate-500 text-xs sm:text-sm leading-relaxed font-semibold">
             {% if payment.status == 'completed' %}
                 مبروك! تم تفعيل اشتراكك في كورس <span class="font-bold text-indigo-600">{{ course.title }}</span> ويمكنك مشاهدة جميع الدروس الآن.
             {% else %}
@@ -18,7 +20,7 @@
         </p>
     </div>
     
-    <a href="{% url 'course_detail' course.id %}" class="block w-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold py-3.5 rounded-2xl hover:opacity-95 transition shadow-lg shadow-indigo-100">
+    <a href="{% url 'course_detail' course.id %}" class="block w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold py-3.5 rounded-2xl transition duration-300 shadow-lg shadow-indigo-100 text-sm">
         العودة لتفاصيل الكورس 📺
     </a>
 </div>
