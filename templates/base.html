@@ -38,7 +38,7 @@
                 <div class="hidden md:flex items-center space-x-reverse space-x-6">
                     <a href="{% url 'course_list' %}" class="text-slate-600 hover:text-indigo-600 font-bold text-sm transition-colors duration-200">جميع الكورسات</a>
                     <a href="{% url 'bundle_list' %}" class="text-slate-600 hover:text-indigo-600 font-bold text-sm transition-colors duration-200">الباقات 📦</a>
-                    <a href="{% url 'about' %}" class="text-slate-600 hover:text-indigo-600 font-bold text-sm transition-colors duration-200">حولنا</a>
+                    <a href="{% url 'about' %}" class="text-slate-600 hover:text-indigo-600 font-bold text-sm transition-colors duration-200">من نحن</a>
                     <a href="{% url 'contact' %}" class="text-slate-600 hover:text-indigo-600 font-bold text-sm transition-colors duration-200">اتصل بنا</a>
                     
                     {% if user.is_authenticated %}
@@ -131,7 +131,7 @@
             
             <a href="{% url 'course_list' %}" class="block py-2.5 px-4 rounded-xl text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 font-bold text-sm transition">📚 جميع الكورسات</a>
             <a href="{% url 'bundle_list' %}" class="block py-2.5 px-4 rounded-xl text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 font-bold text-sm transition">📦 الباقات</a>
-            <a href="{% url 'about' %}" class="block py-2.5 px-4 rounded-xl text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 font-bold text-sm transition">ℹ️ حولنا</a>
+            <a href="{% url 'about' %}" class="block py-2.5 px-4 rounded-xl text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 font-bold text-sm transition">ℹ️ من نحن</a>
             <a href="{% url 'contact' %}" class="block py-2.5 px-4 rounded-xl text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 font-bold text-sm transition">📩 اتصل بنا</a>
             
             {% if user.is_authenticated %}
@@ -188,18 +188,68 @@
     </main>
 
     <!-- Footer أنيق ومتجاوب -->
-    <footer class="bg-white border-t border-slate-100 py-8 text-slate-400 text-sm mt-auto">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-right">
-            <div class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-xs font-black">E</div>
-                <p class="font-bold text-slate-600">جميع الحقوق محفوظة &copy; 2026 EduPoint 🎓</p>
+    <footer class="bg-white border-t border-slate-100 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10">
+                <!-- الشعار والوصف -->
+                <div class="space-y-4">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-600 text-white flex items-center justify-center text-sm font-black shadow-md shadow-indigo-200">E</div>
+                        <span class="text-xl font-black bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 bg-clip-text text-transparent tracking-tight">EduPoint</span>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-500 leading-relaxed font-semibold">
+                        منصتك التعليمية المتكاملة لبناء المستقبل الرقمي. تعلّم من أفضل المدرسين، احصل على شهادات معتمدة، وطوّر مهاراتك.
+                    </p>
+                </div>
+
+                <!-- روابط سريعة -->
+                <div>
+                    <h4 class="font-bold text-slate-800 text-sm sm:text-base mb-4 flex items-center gap-2">
+                        <span>🚀</span> روابط سريعة
+                    </h4>
+                    <ul class="space-y-2.5">
+                        <li><a href="{% url 'course_list' %}" class="text-xs sm:text-sm text-slate-500 hover:text-indigo-600 transition font-semibold">جميع الكورسات</a></li>
+                        <li><a href="{% url 'bundle_list' %}" class="text-xs sm:text-sm text-slate-500 hover:text-indigo-600 transition font-semibold">الباقات 📦</a></li>
+                        <li><a href="{% url 'about' %}" class="text-xs sm:text-sm text-slate-500 hover:text-indigo-600 transition font-semibold">من نحن</a></li>
+                        <li><a href="{% url 'contact' %}" class="text-xs sm:text-sm text-slate-500 hover:text-indigo-600 transition font-semibold">اتصل بنا</a></li>
+                    </ul>
+                </div>
+
+                <!-- للطلاب -->
+                <div>
+                    <h4 class="font-bold text-slate-800 text-sm sm:text-base mb-4 flex items-center gap-2">
+                        <span>🎓</span> للطلاب
+                    </h4>
+                    <ul class="space-y-2.5">
+                        <li><a href="{% url 'student_dashboard' %}" class="text-xs sm:text-sm text-slate-500 hover:text-indigo-600 transition font-semibold">كورساتي</a></li>
+                        <li><a href="{% url 'favorite_list' %}" class="text-xs sm:text-sm text-slate-500 hover:text-indigo-600 transition font-semibold">المفضلة ⭐</a></li>
+                        <li><a href="{% url 'notification_list' %}" class="text-xs sm:text-sm text-slate-500 hover:text-indigo-600 transition font-semibold">الإشعارات 🔔</a></li>
+                        <li><a href="{% url 'verify_certificate' %}" class="text-xs sm:text-sm text-slate-500 hover:text-indigo-600 transition font-semibold">تحقق من شهادة</a></li>
+                    </ul>
+                </div>
+
+                <!-- للأساتذة -->
+                <div>
+                    <h4 class="font-bold text-slate-800 text-sm sm:text-base mb-4 flex items-center gap-2">
+                        <span>👨‍🏫</span> للمدرسين
+                    </h4>
+                    <ul class="space-y-2.5">
+                        <li><a href="{% url 'instructor_dashboard' %}" class="text-xs sm:text-sm text-slate-500 hover:text-indigo-600 transition font-semibold">لوحة المدرس</a></li>
+                        <li><a href="{% url 'create_course' %}" class="text-xs sm:text-sm text-slate-500 hover:text-indigo-600 transition font-semibold">إضافة كورس</a></li>
+                        <li><a href="{% url 'register' %}" class="text-xs sm:text-sm text-slate-500 hover:text-indigo-600 transition font-semibold">إنشاء حساب مدرس</a></li>
+                    </ul>
+                </div>
             </div>
-            <div class="flex items-center gap-6 text-xs text-slate-400">
-                <a href="{% url 'about' %}" class="hover:text-indigo-600 transition">حولنا</a>
-                <a href="{% url 'contact' %}" class="hover:text-indigo-600 transition">اتصل بنا</a>
-                <a href="{% url 'verify_certificate' %}" class="hover:text-indigo-600 transition">تحقق من شهادة</a>
+
+            <!-- شريط السفلي -->
+            <div class="border-t border-slate-100 mt-8 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-right">
+                <p class="text-xs text-slate-400 font-semibold">جميع الحقوق محفوظة &copy; 2026 EduPoint 🎓</p>
+                <div class="flex items-center gap-4 text-xs text-slate-400">
+                    <a href="{% url 'about' %}" class="hover:text-indigo-600 transition font-semibold">من نحن</a>
+                    <a href="{% url 'contact' %}" class="hover:text-indigo-600 transition font-semibold">اتصل بنا</a>
+                    <a href="{% url 'verify_certificate' %}" class="hover:text-indigo-600 transition font-semibold">تحقق من شهادة</a>
+                </div>
             </div>
-            <p class="text-xs text-slate-400">منصتك التعليمية المتكاملة لبناء المستقبل الرقمي</p>
         </div>
     </footer>
 </body>
