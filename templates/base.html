@@ -190,9 +190,9 @@
     <!-- Footer أنيق ومتجاوب -->
     <footer class="bg-white border-t border-slate-100 mt-auto">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10">
+            <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-10">
                 <!-- الشعار والوصف -->
-                <div class="space-y-4">
+                <div class="space-y-4 col-span-2 sm:col-span-1">
                     <div class="flex items-center gap-2">
                         <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-600 text-white flex items-center justify-center text-sm font-black shadow-md shadow-indigo-200">E</div>
                         <span class="text-xl font-black bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 bg-clip-text text-transparent tracking-tight">EduPoint</span>
@@ -212,6 +212,7 @@
                         <li><a href="{% url 'bundle_list' %}" class="text-xs sm:text-sm text-slate-500 hover:text-indigo-600 transition font-semibold">الباقات 📦</a></li>
                         <li><a href="{% url 'about' %}" class="text-xs sm:text-sm text-slate-500 hover:text-indigo-600 transition font-semibold">من نحن</a></li>
                         <li><a href="{% url 'contact' %}" class="text-xs sm:text-sm text-slate-500 hover:text-indigo-600 transition font-semibold">اتصل بنا</a></li>
+                        <li><a href="{% url 'verify_certificate' %}" class="text-xs sm:text-sm text-slate-500 hover:text-indigo-600 transition font-semibold">تحقق من شهادة</a></li>
                     </ul>
                 </div>
 
@@ -224,7 +225,6 @@
                         <li><a href="{% url 'student_dashboard' %}" class="text-xs sm:text-sm text-slate-500 hover:text-indigo-600 transition font-semibold">كورساتي</a></li>
                         <li><a href="{% url 'favorite_list' %}" class="text-xs sm:text-sm text-slate-500 hover:text-indigo-600 transition font-semibold">المفضلة ⭐</a></li>
                         <li><a href="{% url 'notification_list' %}" class="text-xs sm:text-sm text-slate-500 hover:text-indigo-600 transition font-semibold">الإشعارات 🔔</a></li>
-                        <li><a href="{% url 'verify_certificate' %}" class="text-xs sm:text-sm text-slate-500 hover:text-indigo-600 transition font-semibold">تحقق من شهادة</a></li>
                     </ul>
                 </div>
 
@@ -241,14 +241,9 @@
                 </div>
             </div>
 
-            <!-- شريط السفلي -->
-            <div class="border-t border-slate-100 mt-8 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-right">
-                <p class="text-xs text-slate-400 font-semibold">جميع الحقوق محفوظة &copy; 2026 EduPoint 🎓</p>
-                <div class="flex items-center gap-4 text-xs text-slate-400">
-                    <a href="{% url 'about' %}" class="hover:text-indigo-600 transition font-semibold">من نحن</a>
-                    <a href="{% url 'contact' %}" class="hover:text-indigo-600 transition font-semibold">اتصل بنا</a>
-                    <a href="{% url 'verify_certificate' %}" class="hover:text-indigo-600 transition font-semibold">تحقق من شهادة</a>
-                </div>
+            <!-- شريط السفلي: copyright فقط -->
+            <div class="border-t border-slate-100 mt-8 pt-6 text-center">
+                <p class="text-xs text-slate-400 font-semibold">جميع الحقوق محفوظة &copy; 2026 المهندس / صالح محمد صالح 🎓</p>
             </div>
         </div>
     </footer>
