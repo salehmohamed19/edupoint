@@ -1234,3 +1234,37 @@ System check identified 1 issue (0 silenced).
 C:\Users\Administrator\Desktop\«·„‰’… «· ⁄·Ì„Ì…\venv\Lib\site-packages\django\core\handlers\base.py:63: UserWarning: No directory at: C:\Users\Administrator\Desktop\«·„‰’… «· ⁄·Ì„Ì…\staticfiles\
   mw_instance = middleware(adapted_handler)
 [12/Nov/2026 13:09:26] "GET / HTTP/1.1" 500 145
+Performing system checks...
+
+November 12, 2026 - 10:52:41
+Django version 6.1.2, using settings 'edupoint.settings'
+Starting WSGI development server at http://127.0.0.1:8001/
+Quit the server with CTRL-BREAK.
+
+WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
+For more information on production servers see: https://docs.djangoproject.com/en/6.1/howto/deployment/
+System check identified some issues:
+
+WARNINGS:
+?: (staticfiles.W004) The directory 'C:\Users\Administrator\Desktop\«·„‰’… «· ⁄·Ì„Ì…\static' in the STATICFILES_DIRS setting does not exist.
+
+System check identified 1 issue (0 silenced).
+C:\Users\Administrator\Desktop\«·„‰’… «· ⁄·Ì„Ì…\venv\Lib\site-packages\django\core\handlers\base.py:63: UserWarning: No directory at: C:\Users\Administrator\Desktop\«·„‰’… «· ⁄·Ì„Ì…\staticfiles\
+  mw_instance = middleware(adapted_handler)
+Performing system checks...
+
+November 12, 2026 - 15:27:58
+Django version 6.1.2, using settings 'edupoint.settings'
+Starting WSGI development server at http://127.0.0.1:8001/
+Quit the server with CTRL-BREAK.
+
+WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
+For more information on production servers see: https://docs.djangoproject.com/en/6.1/howto/deployment/
+System check identified some issues:
+
+WARNINGS:
+?: (staticfiles.W004) The directory 'C:\Users\Administrator\Desktop\«·„‰’… «· ⁄·Ì„Ì…\static' in the STATICFILES_DIRS setting does not exist.
+
+System check identified 1 issue (0 silenced).
+C:\Users\Administrator\Desktop\«·„‰’… «· ⁄·Ì„Ì…\venv\Lib\site-packages\django\core\handlers\base.py:63: UserWarning: No directory at: C:\Users\Administrator\Desktop\«·„‰’… «· ⁄·Ì„Ì…\staticfiles\
+  mw_instance = middleware(adapted_handler)
