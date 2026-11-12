@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: 'Cairo', sans-serif; background: #f1f5f9; margin: 0; padding: 20px; direction: rtl;">
+    <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 30px; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 24px;">EduPoint 🎓</h1>
+            <p style="color: #d1fae5; margin: 10px 0 0;">تهانينا على نجاحك!</p>
+        </div>
+        <div style="padding: 30px;">
+            <h2 style="color: #1e293b; font-size: 20px; margin-bottom: 15px;">مرحباً {{ user.username }}!</h2>
+            <p style="color: #64748b; line-height: 1.6; margin-bottom: 20px;">
+                تهانينا! لقد نجحت في اختبار درس <strong>"{{ lesson.title }}"</strong> بدرجة <strong>{{ score }}%</strong>.
+            </p>
+            <p style="color: #64748b; line-height: 1.6;">
+                استمر في التقدم,Effortك يؤتي ثماره. نحن فخورون بإنجازاتك!
+            </p>
+        </div>
+        <div style="background: #f8fafc; padding: 20px; text-align: center; border-top: 1px solid #e2e8f0;">
+            <p style="color: #94a3b8; font-size: 12px; margin: 0;">© 2026 EduPoint - جميع الحقوق محفوظة</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -8,3 +8,5 @@ whitenoise>=6.6.0
 gunicorn
 django-allauth
 PyJWT
+qrcode[pil]
+Pillow

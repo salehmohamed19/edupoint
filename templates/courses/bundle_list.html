@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}باقات الكورسات - EduPoint{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto space-y-8">
+    <div class="bg-white rounded-3xl p-6 sm:p-10 shadow-sm border border-slate-100 text-center">
+        <div class="w-16 h-16 rounded-3xl bg-indigo-100 text-indigo-600 flex items-center justify-center mx-auto text-3xl mb-4 shadow-inner">
+            📦
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-black text-slate-900 mb-3">باقات الكورسات المجمعة</h1>
+        <p class="text-slate-500 text-sm sm:text-base">
+            احصل على عدة كورسات في باقة واحدة بسعر أقل من شرائها بشكل منفصل. وفر أموالك وتعلّم أكثر!
+        </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+        {% for bundle in bundles %}
+        <div class="bg-white rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden border border-slate-100 flex flex-col group">
+            <div class="p-6 sm:p-7">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-xs font-extrabold px-3 py-1.5 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-100">باقة</span>
+                    <span class="text-2xl font-black text-indigo-600">{{ bundle.price }} جنيه</span>
+                </div>
+                <h2 class="text-lg sm:text-xl font-bold text-slate-800 mb-2 group-hover:text-indigo-600 transition">{{ bundle.title }}</h2>
+                <p class="text-slate-500 text-xs sm:text-sm leading-relaxed line-clamp-3 mb-6 font-semibold">{{ bundle.description }}</p>
+                <div class="mb-4">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 block">الكورسات المضمنة:</span>
+                    <div class="flex flex-wrap gap-2">
+                        {% for course in bundle.courses.all %}
+                        <span class="text-xs bg-slate-50 text-slate-600 px-2 py-1 rounded-md border border-slate-100">{{ course.title }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="text-xs text-slate-400 font-semibold mb-3">
+                    توفير: <span class="text-indigo-600 font-black">{{ bundle.savings }} جنيه</span>
+                    <span class="text-slate-300">(بدلاً من {{ bundle.total_individual_price }} جنيه)</span>
+                </div>
+            </div>
+            <div class="px-6 pb-6 sm:px-7 sm:pb-7 pt-0">
+                {% if user.is_authenticated %}
+                <form method="POST" action="{% url 'bundle_detail' bundle.id %}" class="w-full">
+                    {% csrf_token %}
+                    <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold py-3.5 rounded-2xl transition shadow-lg shadow-indigo-200 text-xs sm:text-sm">
+                        شراء الباقة 🚀
+                    </button>
+                </form>
+                {% else %}
+                <a href="{% url 'login' %}" class="w-full bg-slate-500 hover:bg-slate-600 text-white font-bold py-3.5 rounded-2xl transition text-xs sm:text-sm text-center block">
+                    تسجيل دخول للشراء
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full text-center py-20 bg-white rounded-3xl border border-slate-100 shadow-sm">
+            <div class="text-5xl mb-4">📦</div>
+            <p class="text-slate-600 font-bold text-base sm:text-lg mb-2">لا توجد باقات متاحة حالياً.</p>
+            <p class="text-slate-400 text-xs sm:text-sm font-semibold">ترقبوا الباقات قريباً!</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

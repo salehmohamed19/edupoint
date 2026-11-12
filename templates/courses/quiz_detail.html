@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}اختبار: {{ lesson.title }} - EduPoint{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-6 sm:space-y-8">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-100">
+        <div class="flex items-center justify-between mb-6 border-b border-slate-100 pb-6">
+            <div>
+                <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-lg">اختبار الدرس</span>
+                <h1 class="text-xl sm:text-2xl font-black text-slate-900 mt-2">{{ lesson.title }}</h1>
+                <p class="text-slate-500 text-xs sm:text-sm mt-1">كورس: {{ course.title }}</p>
+            </div>
+            <a href="{% url 'lesson_detail' course.id lesson.id %}" class="text-indigo-600 hover:text-indigo-800 font-bold text-xs sm:text-sm flex items-center gap-1">
+                <span>← العودة للدرس</span>
+            </a>
+        </div>
+
+        {% if previous_passed %}
+        <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-5 sm:p-6 text-center">
+            <span class="text-3xl mb-3">🎉</span>
+            <h3 class="font-bold text-emerald-800 text-sm sm:text-base">لقد نجحت في هذا الاختبار مسبقاً!</h3>
+            <p class="text-slate-600 text-xs sm:text-sm mt-2">يمكنك الآن مشاهدة الفيديو وإتمام الدرس.</p>
+            <a href="{% url 'lesson_detail' course.id lesson.id %}" class="mt-4 inline-block bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold px-5 py-2.5 rounded-xl transition shadow-sm">
+                مشاهدة الفيديو ▶
+            </a>
+        </div>
+        {% elif last_attempt and not last_attempt.passed %}
+        <div class="bg-rose-50 border border-rose-100 rounded-2xl p-5 sm:p-6 text-center mb-6">
+            <span class="text-3xl mb-3">⚠️</span>
+            <h3 class="font-bold text-rose-800 text-sm sm:text-base">محاولتك الأخيرة</h3>
+            <p class="text-slate-600 text-xs sm:text-sm mt-2">
+                درجاتك: <span class="font-black text-rose-600">{{ last_attempt.score }}%</span> من 100%
+                <br>
+                مطلوب للنجاح: <span class="font-black text-rose-600">{{ quiz.passing_score }}%</span>
+            </p>
+            <p class="text-xs sm:text-sm text-slate-500 mt-2">يمكنك المحاولة مرة أخرى أدناه.</p>
+        </div>
+        {% endif %}
+
+        {% if not previous_passed %}
+        <form method="POST" action="{% url 'submit_quiz' course.id lesson.id %}" class="space-y-6">
+            {% csrf_token %}
+            <div class="bg-slate-50 p-4 sm:p-6 rounded-2xl border border-slate-100 mb-4">
+                <p class="text-xs sm:text-sm text-slate-500 font-semibold mb-3">
+                    مطلوب للنجاح: <span class="font-bold text-indigo-600">{{ quiz.passing_score }}%</span> على الأقل
+                </p>
+                {% for question in questions %}
+                <div class="mb-5 last:mb-0 border-b border-slate-100 pb-4 last:border-0 last:pb-0">
+                    <p class="font-bold text-slate-800 text-xs sm:text-sm mb-3">{{ forloop.counter }}. {{ question.text }}</p>
+                    <div class="space-y-2">
+                        {% for choice in question.choices.all %}
+                        <label class="flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 cursor-pointer transition">
+                            <input type="radio" name="question_{{ question.id }}" value="{{ choice.id }}" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+                            <span class="text-slate-700 text-xs sm:text-sm font-semibold">{{ choice.text }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold py-4 rounded-2xl transition duration-300 shadow-lg shadow-indigo-200 hover:shadow-indigo-300 text-sm text-center flex items-center justify-center gap-2">
+                <span>إرسال الإجابات</span>
+                <span>✍️</span>
+            </button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

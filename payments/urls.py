@@ -12,4 +12,9 @@ urlpatterns = [
         views.payment_success,
         name='payment_success',
     ),
+    path(
+        'webhook/paymob/',
+        views.paymob_webhook,
+        name='paymob_webhook',
+    ),
 ]

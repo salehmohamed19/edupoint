@@ -17,11 +17,30 @@
                     {% if course.is_free %}مجاني بالكامل{% else %}السعر: {{ course.price }} جنيه{% endif %}
                 </span>
                 
+                {% if instructor_avg_rating %}
+                <span class="text-xs sm:text-sm font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-lg border border-indigo-100 flex items-center gap-1">
+                    <span>⭐</span>
+                    <span>{{ instructor_avg_rating }} ({{ instructor_rating_count }} تقييم)</span>
+                </span>
+                {% endif %}
+                
                 {% if user == course.instructor %}
                     <a href="{% url 'add_lesson' course.id %}" class="bg-emerald-600 text-white text-xs sm:text-sm px-4 py-2.5 rounded-xl font-bold hover:bg-emerald-700 transition shadow-md flex items-center gap-1.5">
                         <span>➕</span>
                         <span>إضافة درس</span>
                     </a>
+                {% endif %}
+                {% if user.is_authenticated %}
+                <form method="POST" action="{% url 'toggle_favorite' course.id %}" class="inline" onsubmit="event.preventDefault(); fetch(this.action, {method:'POST', headers:{'X-CSRFToken':'{{ csrf_token }}'}}).then(r=>r.json()).then(d=>{ if(d.status==='added'){ this.querySelector('button').textContent='⭐'; this.querySelector('button').classList.replace('text-slate-400','text-indigo-500'); this.querySelector('button').title='إزالة من المفضلة'; } else { this.querySelector('button').textContent='☆'; this.querySelector('button').classList.replace('text-indigo-500','text-slate-400'); this.querySelector('button').title='أضف للمفضلة'; } });">
+                    {% csrf_token %}
+                    <button type="button" class="text-xs sm:text-sm {% if is_favorite %}text-indigo-500{% else %}text-slate-400{% endif %} hover:text-indigo-500 transition" title="{% if is_favorite %}إزالة من المفضلة{% else %}أضف للمفضلة{% endif %}">
+                        {% if is_favorite %}⭐{% else %}☆{% endif %}
+                    </button>
+                </form>
+                <a href="{% url 'course_questions' course.id %}" class="text-xs sm:text-sm text-slate-600 hover:text-indigo-600 font-bold flex items-center gap-1 transition whitespace-nowrap">
+                    <span>💬</span>
+                    <span>أسئلة وأجوبة</span>
+                </a>
                 {% endif %}
             </div>
         </div>
@@ -153,5 +172,39 @@
         </div>
     </div>
 
+    <!-- تقييم المدرس -->
+    {% if is_enrolled and user != course.instructor %}
+    <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 p-6 sm:p-8">
+        <h3 class="text-xl sm:text-2xl font-black text-slate-900 mb-6">⭐ قيّم المدرس</h3>
+        {% if user_instructor_rating %}
+        <div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-4 mb-6">
+            <p class="text-sm font-bold text-indigo-700">تقييمك: {{ user_instructor_rating.rating }} / 5 ⭐</p>
+            {% if user_instructor_rating.comment %}
+            <p class="text-xs text-slate-600 mt-1">{{ user_instructor_rating.comment }}</p>
+            {% endif %}
+        </div>
+        {% endif %}
+        <form method="POST" action="{% url 'add_instructor_rating' course.id %}" class="space-y-4">
+            {% csrf_token %}
+            <div class="flex items-center gap-2">
+                <label class="text-xs sm:text-sm font-bold text-slate-700">التقييم:</label>
+                <select name="rating" class="bg-white border border-slate-200/80 rounded-xl px-4 py-2 text-xs sm:text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500">
+                    <option value="5" {% if user_instructor_rating.rating == 5 %}selected{% endif %}>⭐⭐⭐⭐⭐ (5)</option>
+                    <option value="4" {% if user_instructor_rating.rating == 4 %}selected{% endif %}>⭐⭐⭐⭐ (4)</option>
+                    <option value="3" {% if user_instructor_rating.rating == 3 %}selected{% endif %}>⭐⭐⭐ (3)</option>
+                    <option value="2" {% if user_instructor_rating.rating == 2 %}selected{% endif %}>⭐⭐ (2)</option>
+                    <option value="1" {% if user_instructor_rating.rating == 1 %}selected{% endif %}>⭐ (1)</option>
+                </select>
+            </div>
+            <div>
+                <textarea name="comment" rows="2" placeholder="تعليقك على المدرس (اختياري)..." class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl p-4 text-xs sm:text-sm font-medium text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500 resize-none">{{ user_instructor_rating.comment|default:'' }}</textarea>
+            </div>
+            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2.5 rounded-2xl text-xs sm:text-sm transition shadow-sm">
+                {% if user_instructor_rating %}تحديث التقييم{% else %}إرسال التقييم{% endif %} ✍️
+            </button>
+        </form>
+    </div>
+    {% endif %}
+ 
 </div>
 {% endblock %}

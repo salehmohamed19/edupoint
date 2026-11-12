@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}المفضلات - EduPoint{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-100">
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-2xl sm:text-3xl font-black text-slate-900">المفضلات ⭐</h1>
+            <a href="{% url 'course_list' %}" class="text-indigo-600 hover:text-indigo-800 font-bold text-xs sm:text-sm flex items-center gap-1">
+                <span>تصفح الكورسات</span>
+                <span>→</span>
+            </a>
+        </div>
+        <p class="text-slate-500 text-xs sm:text-sm">هنا الكورسات التي أضفتها للمفضلة للرجوع إليها لاحقاً.</p>
+    </div>
+
+    {% if favorites %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+        {% for fav in favorites %}
+        {% with course=fav.course %}
+        <div class="bg-white rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden border border-slate-100 flex flex-col justify-between group">
+            <div class="p-6 sm:p-7">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-xs font-extrabold px-3 py-1.5 rounded-full {% if course.is_free %}bg-emerald-50 text-emerald-600 border border-emerald-100{% else %}bg-indigo-50 text-indigo-600 border border-indigo-100{% endif %}">
+                        {% if course.is_free %}مجاني بالكامل{% else %}{{ course.price }} جنيه{% endif %}
+                    </span>
+                    <form method="POST" action="{% url 'toggle_favorite' course.id %}" class="inline" onsubmit="event.preventDefault(); fetch(this.action, {method:'POST', headers:{'X-CSRFToken':'{{ csrf_token }}'}}).then(r=>r.json()).then(d=>{ if(d.status==='removed'){ location.reload(); } });">
+                        {% csrf_token %}
+                        <button type="button" class="text-rose-500 hover:text-rose-700 transition" title="إزالة من المفضلة">
+                            ⭐
+                        </button>
+                    </form>
+                </div>
+                <h2 class="text-lg sm:text-xl font-bold text-slate-800 mb-2.5 group-hover:text-indigo-600 transition">{{ course.title }}</h2>
+                <p class="text-slate-500 text-xs sm:text-sm leading-relaxed line-clamp-3 mb-6 font-semibold">{{ course.description }}</p>
+            </div>
+            <div class="px-6 pb-6 sm:px-7 sm:pb-7 pt-0">
+                <a href="{% url 'course_detail' course.id %}" class="block text-center w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-2xl transition duration-200 text-xs sm:text-sm shadow-sm">
+                    تفاصيل الكورس ✨
+                </a>
+            </div>
+        </div>
+        {% endwith %}
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-20 bg-white rounded-3xl border border-slate-100 shadow-sm">
+        <div class="text-5xl mb-4">🤍</div>
+        <p class="text-slate-600 font-bold text-base sm:text-lg mb-2">لا توجد كورسات في مفضلاتك بعد.</p>
+        <p class="text-slate-400 text-xs sm:text-sm font-semibold">أضف أي كورس للمفضلة من خلال زر النجمة في صفحة الكورس.</p>
+        <a href="{% url 'course_list' %}" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 py-3.5 rounded-2xl transition shadow-md text-xs sm:text-sm mt-6">
+            تصفح الكورسات الآن 🚀
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

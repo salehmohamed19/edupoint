@@ -23,9 +23,9 @@
             <div class="bg-black rounded-3xl overflow-hidden shadow-2xl aspect-video relative border border-slate-800 flex items-center justify-center select-none" oncontextmenu="return false;" ondragstart="return false;">
                 
                 {% if lesson.video_file %}
-                    <!-- مشغل محلي مستقر للتحكم الكامل مع تعطيل زر التحميل فقط -->
+                    <!-- مشغل محلي مع رابط فيديو موقع ومؤقت من Cloudinary (لا يمكن تحميله مباشرة) -->
                     <video id="my-local-video" controls controlsList="nodownload" preload="metadata" class="w-full h-full object-contain pointer-events-auto">
-                        <source src="{{ lesson.video_file.url }}" type="video/mp4">
+                        <source id="video-source" type="video/mp4">
                         متصفحك لا يدعم تشغيل الفيديو.
                     </video>
                 {% elif embed_url %}
@@ -47,6 +47,17 @@
                         <p class="font-bold text-sm">لا توجد مادة فيديو متاحة لهذا الدرس حالياً.</p>
                     </div>
                 {% endif %}
+            </div>
+
+            <!-- شريط تقدم الدرس التفاعلي -->
+            <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-100">
+                <div class="flex justify-between text-xs text-slate-500 mb-2">
+                    <span class="font-bold">تقدم الدرس</span>
+                    <span id="progress-text">0%</span>
+                </div>
+                <div class="w-full bg-slate-200 rounded-full h-3">
+                    <div id="progress-bar" class="bg-indigo-600 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
             </div>
 
             <!-- زر إتمام الدرس والانتقال للدرس التالي -->
@@ -110,6 +121,41 @@
                         </a>
                     {% else %}
                         <p class="text-slate-400 text-xs sm:text-sm italic">لا توجد ملفات مرفقة مع هذا الدرس.</p>
+                    {% endif %}
+                </div>
+
+                <!-- تعليقات الدرس -->
+                <div class="pt-4 border-t border-slate-100">
+                    <h3 class="text-sm sm:text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
+                        <span>💬</span> تعليقات الدرس:
+                    </h3>
+                    {% if user.is_authenticated %}
+                    <form method="POST" action="{% url 'add_lesson_comment' lesson.id %}" class="mb-4 space-y-3">
+                        {% csrf_token %}
+                        <textarea name="content" rows="3" required placeholder="اكتب تعليقك على هذا الدرس..." class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3 text-slate-800 text-sm font-semibold focus:ring-4 focus:ring-indigo-100 outline-none transition resize-none"></textarea>
+                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl transition shadow-sm text-xs sm:text-sm">
+                            إضافة تعليق ✍️
+                        </button>
+                    </form>
+                    {% else %}
+                    <p class="text-slate-400 text-xs sm:text-sm italic">سجل دخولك لإضافة تعليق.</p>
+                    {% endif %}
+
+                    {% if lesson_comments %}
+                    <div class="space-y-3 mt-4">
+                        {% for comment in lesson_comments %}
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                            <div class="flex items-center gap-2 mb-1 text-[10px] text-slate-400 font-bold">
+                                <span>{{ comment.student.username }}</span>
+                                <span>•</span>
+                                <span>{{ comment.created_at|date:"Y/m/d h:i A" }}</span>
+                            </div>
+                            <p class="text-slate-700 text-xs sm:text-sm leading-relaxed">{{ comment.content }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-slate-400 text-xs sm:text-sm italic mt-4">لا توجد تعليقات بعد. كن أول من يعلق!</p>
                     {% endif %}
                 </div>
 
@@ -198,7 +244,47 @@
         const completeUrl = "{% url 'mark_lesson_complete' lesson.id %}";
         const csrfToken = "{{ csrf_token }}";
 
+        // جلب رابط الفيديو الموقع والمؤقت من السيرفر (Cloudinary Signed URL)
+        const signedVideoUrlUrl = "{% url 'get_signed_video_url' lesson.id %}";
+
+        async function loadSignedVideoUrl() {
+            try {
+                const response = await fetch(signedVideoUrlUrl, {
+                    method: 'GET',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.signed_url) {
+                        const source = document.getElementById('video-source');
+                        source.src = data.signed_url;
+                        videoElement.load();
+                    }
+                } else {
+                    console.error('فشل في جلب رابط الفيديو الموقع:', response.status);
+                }
+            } catch (err) {
+                console.error('خطأ في جلب رابط الفيديو الموقع:', err);
+            }
+        }
+
         if (videoElement) {
+            // جلب رابط الفيديو الموقع قبل بدء التشغيل
+            loadSignedVideoUrl();
+
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+
+            function updateProgressBar() {
+                if (!videoElement || !videoElement.duration || !progressBar) return;
+                const percent = (videoElement.currentTime / videoElement.duration) * 100;
+                progressBar.style.width = Math.min(percent, 100) + '%';
+                progressText.textContent = Math.round(percent) + '%';
+            }
+
             let hasRestoredTime = false;
             
             const restoreTime = function() {
@@ -210,6 +296,9 @@
                         videoElement.currentTime = savedSeconds;
                         hasRestoredTime = true;
                     }
+                }
+                if (videoElement.duration) {
+                    updateProgressBar();
                 }
             };
 
@@ -244,6 +333,8 @@
 
             // حفظ الوقت كل 5 ثوانٍ أثناء التشغيل
             videoElement.addEventListener('timeupdate', function() {
+                updateProgressBar();
+
                 if (!videoElement.paused && Math.abs(videoElement.currentTime - lastSavedTime) > 5) {
                     lastSavedTime = videoElement.currentTime;
                     sendProgress(false);

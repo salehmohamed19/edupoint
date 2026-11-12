@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}{{ bundle.title }} - EduPoint{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-8">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-100">
+        <div class="flex items-center justify-between mb-6 border-b border-slate-100 pb-6">
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-black text-slate-900 mb-2">{{ bundle.title }}</h1>
+                <p class="text-slate-500 text-sm sm:text-base leading-relaxed">{{ bundle.description }}</p>
+            </div>
+            <a href="{% url 'bundle_list' %}" class="text-indigo-600 hover:text-indigo-800 font-bold text-xs sm:text-sm flex items-center gap-1">
+                <span>← العودة للباقات</span>
+            </a>
+        </div>
+
+        <!-- عرض السعر والتوفير -->
+        <div class="bg-gradient-to-r from-indigo-50 via-purple-50 to-violet-50 p-6 rounded-3xl border border-indigo-100/80 flex items-center justify-between shadow-sm mb-6">
+            <div>
+                <span class="text-xs text-slate-500 font-bold block mb-1">سعر الباقة:</span>
+                <span class="text-3xl sm:text-4xl font-black text-indigo-600">{{ bundle.price }} <span class="text-sm font-bold">جنيه</span></span>
+            </div>
+            <div class="text-right">
+                <span class="text-xs text-slate-400 font-bold block mb-1">السعر الفردي للكورسات:</span>
+                <span class="text-xs text-rose-600 font-bold line-through">{{ bundle.total_individual_price }} جنيه</span>
+                <span class="text-emerald-600 font-bold block mt-1">توفير {{ bundle.savings }} جنيه 🎉</span>
+            </div>
+        </div>
+
+        <!-- الكورسات المضمنة -->
+        <div>
+            <h3 class="font-bold text-slate-900 text-sm sm:text-base mb-4 flex items-center gap-2">
+                <span>📚</span> الكورسات المضمنة في الباقة ({{ bundle.courses.count }})
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {% for course in bundle.courses.all %}
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    <h4 class="font-bold text-slate-800 text-xs sm:text-sm mb-1">{{ course.title }}</h4>
+                    <p class="text-[10px] text-slate-500 line-clamp-2 mb-2">{{ course.description }}</p>
+                    <span class="text-xs font-bold {% if course.is_free %}text-emerald-600 bg-emerald-50{% else %}text-indigo-600 bg-indigo-50{% endif %} px-2 py-0.5 rounded-md">
+                        {% if course.is_free %}مجاني{% else %}{{ course.price }} جنيه{% endif %}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- زر الشراء -->
+        {% if user.is_authenticated %}
+        <form method="POST" class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+            {% csrf_token %}
+            <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold py-4 rounded-2xl transition shadow-lg shadow-indigo-200 hover:shadow-indigo-300 text-sm flex items-center justify-center gap-2">
+                <span>اشترِ الباقة الآن</span>
+                <span>📦</span>
+            </button>
+            <p class="text-[10px] text-slate-400 mt-3 text-center">عند الشراء، سيتم تسجيلك تلقائياً في جميع الكורסات المضمنة.</p>
+        </form>
+        {% else %}
+        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm text-center">
+            <p class="text-slate-600 text-sm sm:text-base mb-4">يرجى تسجيل الدخول لشراء هذه الباقة.</p>
+            <a href="{% url 'login' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-2xl transition inline-block text-xs sm:text-sm">تسجيل دخول</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

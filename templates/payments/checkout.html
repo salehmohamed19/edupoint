@@ -15,10 +15,39 @@
     <div class="bg-gradient-to-r from-indigo-50 via-purple-50 to-violet-50 p-6 rounded-3xl border border-indigo-100/80 flex items-center justify-between shadow-sm">
         <div>
             <span class="text-xs text-slate-500 font-bold block mb-1">المبلغ المطلوب سداده:</span>
+            {% if discounted_amount != course.price %}
+            <span class="text-3xl sm:text-4xl font-black text-indigo-600">{{ discounted_amount }} <span class="text-sm font-bold">جنيه</span></span>
+            <span class="text-xs text-emerald-600 font-bold block mt-1">✓ تم تطبيق خصم الكوبون</span>
+            {% else %}
             <span class="text-3xl sm:text-4xl font-black text-indigo-600">{{ payment.amount }} <span class="text-sm font-bold">جنيه</span></span>
+            {% endif %}
         </div>
         <div class="text-4xl">💰</div>
     </div>
+
+    <!-- كوبون الخصم -->
+    {% if not payment or payment.status != 'pending_verification' %}
+    <div class="bg-slate-50 p-5 sm:p-6 rounded-3xl border border-slate-100 space-y-4">
+        <h3 class="font-extrabold text-slate-800 text-sm sm:text-base flex items-center gap-2">
+            <span>🎟️</span>
+            <span>كود خصم (اختياري)</span>
+        </h3>
+        <form method="GET" action="" class="flex flex-col sm:flex-row gap-3">
+            {% csrf_token %}
+            <input type="text" name="coupon" value="{{ coupon_code|default:'' }}" placeholder="أدخل كود الخصم هنا..." class="flex-1 px-4 py-3 rounded-2xl bg-white border border-slate-200/80 text-slate-800 text-sm font-semibold focus:ring-4 focus:ring-indigo-100 outline-none transition">
+            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3 rounded-2xl transition shadow-sm text-sm whitespace-nowrap">
+                تطبيق 🎟️
+            </button>
+        </form>
+        {% if coupon_error %}
+        <div class="text-xs text-rose-600 font-bold bg-rose-50 px-3 py-2 rounded-lg border border-rose-100">{{ coupon_error }}</div>
+        {% elif coupon %}
+        <div class="text-xs text-emerald-600 font-bold bg-emerald-50 px-3 py-2 rounded-lg border border-emerald-100">
+            كوبون "{{ coupon.code }}" فعال - خصم {% if coupon.discount_type == 'percentage' %}{{ coupon.discount_value }}%{% else %}{{ coupon.discount_value }} جنيه{% endif %}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
 
     <!-- تعليمات وأرقام التحويل -->
     <div class="bg-slate-50 p-5 sm:p-6 rounded-3xl border border-slate-100 space-y-4">
@@ -64,6 +93,7 @@
                 <option value="instapay">إنستاباي (Instapay)</option>
                 <option value="bank_transfer">تحويل بنكي مباشر</option>
                 <option value="fawry">خدمة فوري</option>
+                <option value="paymob">Paymob (دفع إلكتروني فوري)</option>
             </select>
         </div>
 

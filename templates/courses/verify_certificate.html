@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}تحقق من الشهادة - EduPoint{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-8">
+    <div class="bg-white rounded-3xl p-6 sm:p-10 shadow-sm border border-slate-100 text-center">
+        <div class="w-16 h-16 rounded-3xl bg-indigo-100 text-indigo-600 flex items-center justify-center mx-auto text-3xl mb-4 shadow-inner">
+            🔍
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-black text-slate-900 mb-3">تحقق من صحة الشهادة</h1>
+        <p class="text-slate-500 text-sm sm:text-base">أدخل رقم الشهادة للتحقق من صحتها ومصداقيتها من منصة EduPoint.</p>
+
+        <form id="verify-form" class="mt-6 flex flex-col sm:flex-row gap-3 justify-center" onsubmit="event.preventDefault(); const id = document.getElementById('cert-id-input').value.trim(); if(id) { window.location.href = '{% url 'verify_certificate_detail' '00000000-0000-0000-0000-000000000000' %}'.replace('00000000-0000-0000-0000-000000000000', id); }">
+            {% csrf_token %}
+            <input type="text" id="cert-id-input" name="certificate_id" value="{{ certificate_id|default:'' }}" placeholder="أدخل معرف الشهادة (مثال: a1b2c3d4-...)" required class="flex-1 sm:w-96 px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200/80 text-slate-800 text-sm font-semibold focus:ring-4 focus:ring-indigo-100 outline-none transition">
+            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3 rounded-2xl transition shadow-sm text-sm whitespace-nowrap">
+                تحقق 🔎
+            </button>
+        </form>
+    </div>
+
+    {% if found is False %}
+    <div class="bg-rose-50 border border-rose-100 rounded-3xl p-6 sm:p-8 text-center shadow-sm">
+        <div class="text-4xl mb-3">❌</div>
+        <h3 class="font-bold text-rose-800 text-sm sm:text-base mb-2">الشهادة غير موجودة</h3>
+        <p class="text-slate-600 text-xs sm:text-sm max-w-md mx-auto">
+            لم نتمكن من العثور على شهادة تحمل هذا المعرف. يرجى التأكد من رقم الشهادة والمحاولة مرة أخرى.
+        </p>
+    </div>
+    {% elif found and certificate %}
+    <div class="bg-emerald-50 border border-emerald-100 rounded-3xl p-6 sm:p-8 shadow-sm">
+        <div class="text-3xl mb-4">✓</div>
+        <h3 class="font-bold text-emerald-800 text-sm sm:text-base mb-2">الشهادة صحيحة وموثقة</h3>
+        <div class="bg-white p-5 rounded-2xl border border-slate-100 text-left space-y-4 mb-6">
+            <div class="flex justify-between text-slate-600 text-xs sm:text-sm border-b border-slate-50 pb-2">
+                <span>اسم المتدرب:</span>
+                <span class="font-bold text-slate-900">{{ certificate.student.get_full_name|default:certificate.student.username }}</span>
+            </div>
+            <div class="flex justify-between text-slate-600 text-xs sm:text-sm border-b border-slate-50 pb-2">
+                <span>الكورس:</span>
+                <span class="font-bold text-slate-900">{{ certificate.course.title }}</span>
+            </div>
+            <div class="flex justify-between text-slate-600 text-xs sm:text-sm border-b border-slate-50 pb-2">
+                <span>تاريخ الإصدار:</span>
+                <span class="font-bold text-slate-900">{{ certificate.issued_at|date:"Y / m / d" }}</span>
+            </div>
+            <div class="flex justify-between text-slate-600 text-xs sm:text-sm">
+                <span>نسبة الإكمال:</span>
+                <span class="font-bold text-slate-900">{{ completed_lessons }} من {{ total_lessons }} درس</span>
+            </div>
+        </div>
+        <div class="text-xs text-slate-400 mt-4">
+            رقم الشهادة: <span class="font-mono font-bold text-indigo-600 break-all">{{ certificate.certificate_id }}</span>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

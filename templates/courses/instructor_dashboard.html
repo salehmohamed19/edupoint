@@ -70,6 +70,26 @@
 
     </div>
 
+    <!-- بطاقات إحصائيات التفاعل (دروس وإكمالات) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-2">
+            <div class="flex justify-between items-center text-slate-400">
+                <span class="text-xs font-bold uppercase tracking-wider">إجمالي الدروس</span>
+                <span class="text-xl">📚</span>
+            </div>
+            <h3 class="text-xl sm:text-2xl font-black text-slate-900">{{ total_lessons }}</h3>
+            <p class="text-[11px] text-slate-400 font-semibold">دروس منشورة في كورساتك</p>
+        </div>
+        <div class="bg-gradient-to-br from-indigo-600 to-violet-600 text-white p-6 rounded-3xl shadow-xl shadow-indigo-100 space-y-2">
+            <div class="flex justify-between items-center opacity-80">
+                <span class="text-xs font-bold uppercase tracking-wider">إجمالي الإكمالات</span>
+                <span class="text-xl">✅</span>
+            </div>
+            <h3 class="text-xl sm:text-2xl font-black">{{ total_completions }}</h3>
+            <p class="text-[11px] text-indigo-100 font-semibold">دروس أكملها الطلاب بنجاح</p>
+        </div>
+    </div>
+
     <!-- جدول تقرير الكورسات والأرباح التفصيلية لكل كورس على حدة -->
     <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-xl shadow-slate-200/50 space-y-6">
         <div class="flex items-center justify-between border-b border-slate-100 pb-5">

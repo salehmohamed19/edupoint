@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}اتصل بنا - EduPoint{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-8">
+    <div class="bg-white rounded-3xl p-6 sm:p-10 shadow-sm border border-slate-100">
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 rounded-3xl bg-indigo-100 text-indigo-600 flex items-center justify-center mx-auto text-3xl mb-4 shadow-inner">
+                📩
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-black text-slate-900 mb-3">اتصل بنا</h1>
+            <p class="text-slate-500 text-sm sm:text-base">لأي استفسار أو اقتراح أو دعم فني، يرجى ملء النموذج أدناه وسنرد عليك في أقرب وقت ممكن.</p>
+        </div>
+
+        <form method="POST" class="space-y-5">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                    <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-2">الاسم الكامل</label>
+                    <input type="text" name="name" required placeholder="مثال: أحمد محمد" class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3 text-slate-800 text-sm font-semibold focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition">
+                </div>
+                <div>
+                    <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-2">البريد الإلكتروني</label>
+                    <input type="email" name="email" required placeholder="example@email.com" class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3 text-slate-800 text-sm font-semibold focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition">
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-2">موضوع الرسالة</label>
+                <input type="text" name="subject" required placeholder="مثال: استفسار عن الكورسات" class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3 text-slate-800 text-sm font-semibold focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition">
+            </div>
+            <div>
+                <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-2">نص الرسالة</label>
+                <textarea name="message" rows="5" required placeholder="اكتب رسالتك هنا..." class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3 text-slate-800 text-sm font-semibold focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition resize-none"></textarea>
+            </div>
+            <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold py-4 rounded-2xl transition duration-300 shadow-lg shadow-indigo-200 hover:shadow-indigo-300 text-sm text-center flex items-center justify-center gap-2">
+                <span>إرسال الرسالة</span>
+                <span>🚀</span>
+            </button>
+        </form>
+    </div>
+
+    <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-100">
+        <h3 class="font-bold text-slate-900 text-sm sm:text-base mb-6 flex items-center gap-2">
+            <span>📞</span> وسائل التواصل
+        </h3>
+        <div class="space-y-4">
+            <div class="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                <span class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm font-bold">📧</span>
+                <div>
+                    <p class="text-xs text-slate-500 font-bold uppercase">البريد الإلكتروني</p>
+                    <p class="text-slate-700 text-xs sm:text-sm font-semibold">support@edupoint.example.com</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                <span class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm font-bold">💬</span>
+                <div>
+                    <p class="text-xs text-slate-500 font-bold uppercase">واتساب</p>
+                    <p class="text-slate-700 text-xs sm:text-sm font-semibold">+20 100 000 0000</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                <span class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm font-bold">🕒</span>
+                <div>
+                    <p class="text-xs text-slate-500 font-bold uppercase">ساعات العمل</p>
+                    <p class="text-slate-700 text-xs sm:text-sm font-semibold">كل الأيام من ٩ ص إلى ٩ م</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

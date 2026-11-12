@@ -13,6 +13,33 @@
             بحث 🔍
         </button>
     </form>
+
+    <!-- شريط الفلاتر المتقدمة -->
+    <div class="mt-6 flex flex-col sm:flex-row gap-3 sm:gap-4 overflow-x-auto pb-2">
+        <a href="?{% if query %}q={{ query }}&{% endif %}sort=newest" class="px-4 py-2 rounded-xl whitespace-nowrap text-xs sm:text-sm font-bold {% if selected_sort == 'newest' %}bg-indigo-600 text-white shadow-md shadow-indigo-200{% else %}bg-slate-50 text-slate-600 border border-slate-200{% endif %} hover:bg-indigo-50 transition">
+            الأحدث أولاً
+        </a>
+        <a href="?{% if query %}q={{ query }}&{% endif %}sort=price_asc" class="px-4 py-2 rounded-xl whitespace-nowrap text-xs sm:text-sm font-bold {% if selected_sort == 'price_asc' %}bg-indigo-600 text-white shadow-md shadow-indigo-200{% else %}bg-slate-50 text-slate-600 border border-slate-200{% endif %} hover:bg-indigo-50 transition">
+            السعر: منخفض إلى مرتفع
+        </a>
+        <a href="?{% if query %}q={{ query }}&{% endif %}sort=price_desc" class="px-4 py-2 rounded-xl whitespace-nowrap text-xs sm:text-sm font-bold {% if selected_sort == 'price_desc' %}bg-indigo-600 text-white shadow-md shadow-indigo-200{% else %}bg-slate-50 text-slate-600 border border-slate-200{% endif %} hover:bg-indigo-50 transition">
+            السعر: مرتفع إلى منخفض
+        </a>
+        <a href="?{% if query %}q={{ query }}&{% endif %}price=free" class="px-4 py-2 rounded-xl whitespace-nowrap text-xs sm:text-sm font-bold {% if selected_price == 'free' %}bg-emerald-600 text-white shadow-md shadow-emerald-200{% else %}bg-slate-50 text-slate-600 border border-slate-200{% endif %} hover:bg-emerald-50 transition">
+            مجاني فقط
+        </a>
+        <a href="?{% if query %}q={{ query }}&{% endif %}price=paid" class="px-4 py-2 rounded-xl whitespace-nowrap text-xs sm:text-sm font-bold {% if selected_price == 'paid' %}bg-indigo-600 text-white shadow-md shadow-indigo-200{% else %}bg-slate-50 text-slate-600 border border-slate-200{% endif %} hover:bg-indigo-50 transition">
+            مدفوع فقط
+        </a>
+        {% if categories %}
+        <select name="category" id="category-filter" class="px-4 py-2 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-700 text-xs sm:text-sm font-semibold outline-none focus:ring-2 focus:ring-indigo-500 whitespace-nowrap">
+            <option value="">جميع التصنيفات</option>
+            {% for cat in categories %}
+            <option value="{{ cat.id }}" {% if selected_category|stringformat:"s" == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+            {% endfor %}
+        </select>
+        {% endif %}
+    </div>
 </div>
 
 <!-- شبكة الكورسات -->
@@ -24,7 +51,18 @@
                 <span class="text-xs font-extrabold px-3 py-1.5 rounded-full {% if course.is_free %}bg-emerald-50 text-emerald-600 border border-emerald-100{% else %}bg-indigo-50 text-indigo-600 border border-indigo-100{% endif %}">
                     {% if course.is_free %}مجاني بالكامل{% else %}{{ course.price }} جنيه{% endif %}
                 </span>
-                <span class="text-xs text-slate-400 font-semibold">بواسطة: {{ course.instructor.username }}</span>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        {% if course.category %}
+                        <span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">{{ course.category.name }}</span>
+                        {% endif %}
+                        <span class="text-xs text-slate-400 font-semibold">بواسطة: {{ course.instructor.username }}</span>
+                    </div>
+                    <form method="POST" action="{% url 'toggle_favorite' course.id %}" class="inline" onsubmit="event.preventDefault(); fetch(this.action, {method:'POST', headers:{'X-CSRFToken':'{{ csrf_token }}'}}).then(r=>r.json()).then(d=>{ if(d.status==='added'){ this.querySelector('button').textContent='⭐'; this.querySelector('button').classList.replace('text-slate-400','text-indigo-500'); } else { this.querySelector('button').textContent='☆'; this.querySelector('button').classList.replace('text-indigo-500','text-slate-400'); } });">
+                        {% csrf_token %}
+                        <button type="button" class="text-slate-400 hover:text-indigo-500 transition text-lg" title="أضف للمفضلة">☆</button>
+                    </form>
+                </div>
             </div>
             <h2 class="text-lg sm:text-xl font-bold text-slate-800 mb-2.5 group-hover:text-indigo-600 transition">{{ course.title }}</h2>
             <p class="text-slate-500 text-xs sm:text-sm leading-relaxed line-clamp-3 mb-6 font-semibold">{{ course.description }}</p>
@@ -43,4 +81,16 @@
     </div>
     {% endfor %}
 </div>
+
+<script>
+    document.getElementById('category-filter')?.addEventListener('change', function() {
+        const params = new URLSearchParams(window.location.search);
+        if (this.value) {
+            params.set('category', this.value);
+        } else {
+            params.delete('category');
+        }
+        window.location.search = params.toString();
+    });
+</script>
 {% endblock %}
